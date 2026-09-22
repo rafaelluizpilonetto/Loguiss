@@ -19,10 +19,10 @@ function Produtos() {
     const [fornecedores, setFornecedores] = useState([]);
     const [categorias, setCategorias] = useState([]);
     const [unidades, setUnidades] = useState([]);
-    const [mostrarProdutos, setMostrarProdutos] = useState(false);
     const [mostrarFornecedores, setMostrarFornecedores] = useState(false);
     const [mostrarCategorias, setMostrarCategorias] = useState(false);
     const [mostrarUnidades, setMostrarUnidades] = useState(false);
+    const [mostrarProdutos, setMostrarProdutos] = useState(false);
     const [products, setProducts] = useState([]);
     const [searchTerm, setSearchTerm] = useState("");
     const [appliedSearch, setAppliedSearch] = useState("");
@@ -89,30 +89,6 @@ function Produtos() {
         categoria_api();
         unidade_api();
     }, [])
-
-    const addNewProduct = () => {
-
-        setProducts((produtosAtuais) => [
-            ...produtosAtuais,
-            newProduct
-        ]);
-
-        setShowProductForm(false);
-
-        setNewProduct({
-            desc: "",
-            categoria: "",
-            minimo: "",
-            unidade: "",
-            valor: "",
-            quantidade_estoque: "15",
-            fornecedor: "",
-            dt_entrada: "",
-            prazo_saida: "",
-            fgTipoProducao: false,
-            receita: null
-        });
-    };
 
     const editProduct = (index, updatedProduct) => {
         setProducts((produtosAtuais) => {
@@ -689,138 +665,113 @@ function Produtos() {
                                                             key={index}
                                                             className="mb-3 grid grid-cols-1 gap-3 md:grid-cols-4"
                                                         >
-                                                            {/* Produto */}
                                                             <div className="relative flex-1 min-w-0">
-                                                                <input
-                                                                    type="text"
-                                                                    placeholder="Produto"
-                                                                    value={ingrediente.produto}
-                                                                    onChange={(e) => {
-                                                                        const ingredientes = [...newReceita.ingredientes];
+                                                            <input
+                                                                type="text"
+                                                                placeholder="Produto"
+                                                                value={ingrediente.produto}
+                                                                onChange={(e) => {
+                                                                const ingredientes = [...newReceita.ingredientes];
+                                                                ingredientes[index].produto = e.target.value;
+                                                                ingredientes[index].id_produto = null;
+                                                                setMostrarProdutos(true);
 
-                                                                        ingredientes[index].produto = e.target.value;
-                                                                        ingredientes[index].id_produto = null;
-                                                                        setMostrarProdutos(true);
+                                                                setNewReceita({
+                                                                    ...newReceita,
+                                                                    ingredientes,
+                                                                });
+                                                                }}
+                                                                className="w-full rounded-lg border border-gray-700 bg-[#15102b] p-3"
+                                                                required
+                                                            />
+
+                                                            {mostrarProdutos && ingrediente.produto && (
+                                                                <div className="absolute left-0 top-full z-50 mt-1 max-h-48 w-full overflow-y-auto rounded-lg border border-gray-700 bg-[#15102b] shadow-lg">
+                                                                {products
+                                                                    .filter((produto) =>
+                                                                    produto.descricao
+                                                                        .toLowerCase()
+                                                                        .includes(ingrediente.produto.toLowerCase())
+                                                                    )
+                                                                    .map((produto) => (
+                                                                    <button
+                                                                        type="button"
+                                                                        key={produto.id_produto}
+                                                                        onClick={() => {
+                                                                        const ingredientes = [...newReceita.ingredientes];
+                                                                        setMostrarProdutos(false);
+                                                                        ingredientes[index].produto = produto.descricao;
+                                                                        ingredientes[index].id_produto = produto.id_produto;
 
                                                                         setNewReceita({
                                                                             ...newReceita,
                                                                             ingredientes,
                                                                         });
-                                                                    }}
-                                                                    className="w-full rounded-lg border border-gray-700 bg-[#15102b] p-3"
-                                                                    required
-                                                                />
-
-                                                                {ingrediente.produto && (
-                                                                    <div className="absolute left-0 top-full z-50 mt-1 max-h-48 w-full overflow-y-auto rounded-lg border border-gray-700 bg-[#15102b] shadow-lg">
-                                                                        {products
-                                                                            .filter((produto) =>
-                                                                                produto.descricao
-                                                                                    .toLowerCase()
-                                                                                    .includes(ingrediente.produto.toLowerCase())
-                                                                            )
-                                                                            .map((produto) => (
-                                                                                <button
-                                                                                    type="button"
-                                                                                    key={produto.id_produto}
-                                                                                    onClick={() => {
-                                                                                        const ingredientes = [
-                                                                                            ...newReceita.ingredientes,
-                                                                                        ];
-                                                                                        setMostrarProdutos(false);
-                                                                                        ingredientes[index].produto =
-                                                                                            produto.descricao;
-
-                                                                                        ingredientes[index].id_produto =
-                                                                                            produto.id_produto;
-
-                                                                                        setNewReceita({
-                                                                                            ...newReceita,
-                                                                                            ingredientes,
-                                                                                        });
-                                                                                    }}
-                                                                                    className="block w-full px-3 py-2 text-left text-white hover:bg-[#241b45]"
-                                                                                >
-                                                                                    {produto.descricao}
-                                                                                </button>
-                                                                            ))}
-                                                                    </div>
-                                                                )}
+                                                                        }}
+                                                                        className="block w-full px-3 py-2 text-left text-white hover:bg-[#241b45]"
+                                                                    >
+                                                                        {produto.descricao}
+                                                                    </button>
+                                                                    ))}
+                                                                </div>
+                                                            )}
                                                             </div>
-                                                            {/* Quantidade */}
+
                                                             <input
-                                                                type="number"
-                                                                placeholder="Quantidade"
-                                                                value={ingrediente.quantidade}
-                                                                onChange={(e) => {
-                                                                    const ingredientes = [
-                                                                        ...newReceita.ingredientes,
-                                                                    ];
+                                                            type="number"
+                                                            placeholder="Quantidade"
+                                                            value={ingrediente.quantidade}
+                                                            onChange={(e) => {
+                                                                const ingredientes = [...newReceita.ingredientes];
+                                                                ingredientes[index].quantidade = e.target.value;
 
-                                                                    ingredientes[index].quantidade =
-                                                                        e.target.value;
-
-                                                                    setNewReceita({
-                                                                        ...newReceita,
-                                                                        ingredientes,
-                                                                    });
-                                                                }}
-                                                                className="rounded-lg border border-gray-700 bg-[#15102b] p-3"
-                                                                required
+                                                                setNewReceita({
+                                                                ...newReceita,
+                                                                ingredientes,
+                                                                });
+                                                            }}
+                                                            className="rounded-lg border border-gray-700 bg-[#15102b] p-3"
+                                                            required
                                                             />
 
-                                                            {/* Unidade */}
                                                             <select
-                                                                value={ingrediente.id_unidade || ""}
-                                                                onChange={(e) => {
-                                                                    const ingredientes = [
-                                                                        ...newReceita.ingredientes,
-                                                                    ];
+                                                            value={ingrediente.id_unidade || ""}
+                                                            onChange={(e) => {
+                                                                const ingredientes = [...newReceita.ingredientes];
+                                                                ingredientes[index].id_unidade = Number(e.target.value);
 
-                                                                    ingredientes[index].id_unidade = Number(e.target.value);
-
-                                                                    setNewReceita({
-                                                                        ...newReceita,
-                                                                        ingredientes,
-                                                                    });
-                                                                }}
-                                                                className="rounded-lg border border-gray-700 bg-[#15102b] p-3"
-                                                                required
+                                                                setNewReceita({
+                                                                ...newReceita,
+                                                                ingredientes,
+                                                                });
+                                                            }}
+                                                            className="rounded-lg border border-gray-700 bg-[#15102b] p-3"
+                                                            required
                                                             >
-                                                                <option value="">
-                                                                    Unidade
-                                                                </option>
+                                                            <option value="">Unidade</option>
 
-                                                                {unidades.map((unidade) => (
-                                                                    <option
-                                                                        key={unidade.id_unidade}
-                                                                        value={unidade.id_unidade}
-                                                                    >
-                                                                        {unidade.descrunidade} - {unidade.nomenclatura}
-                                                                    </option>
-                                                                ))}
+                                                            {unidades.map((unidade) => (
+                                                                <option key={unidade.id_unidade} value={unidade.id_unidade}>
+                                                                {unidade.descrunidade} - {unidade.nomenclatura}
+                                                                </option>
+                                                            ))}
                                                             </select>
 
-                                                            {/* Remover produto */}
                                                             <button
-                                                                type="button"
-                                                                onClick={() => {
-                                                                    const ingredientes =
-                                                                        newReceita.ingredientes.filter(
-                                                                            (_, i) => i !== index
-                                                                        );
-
-                                                                    setNewReceita({
-                                                                        ...newReceita,
-                                                                        ingredientes,
-                                                                    });
-                                                                }}
-                                                                className="rounded-lg border border-red-700 px-4 py-2 text-red-400 hover:bg-red-950"
+                                                            type="button"
+                                                            onClick={() => {
+                                                                const ingredientes = newReceita.ingredientes.filter((_, i) => i !== index);
+                                                                setNewReceita({
+                                                                ...newReceita,
+                                                                ingredientes,
+                                                                });
+                                                            }}
+                                                            className="rounded-lg border border-red-700 px-4 py-2 text-red-400 hover:bg-red-950"
                                                             >
-                                                                Remover
+                                                            Remover
                                                             </button>
                                                         </div>
-                                                    ))}
+                                                        ))}
 
                                                     {/* Adicionar produto */}
                                                     <button

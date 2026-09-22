@@ -224,31 +224,27 @@ function Usuarios() {
                                 e.preventDefault();
 
                                 const erro = validarConfirmarSenha(
-                                    newUsuario.senha,
-                                    newUsuario.confirm_senha
+                                newUsuario.senha,
+                                newUsuario.confirm_senha
                                 );
 
                                 if (erro) {
-                                    setErroConfirmarSenha(erro);
-                                    toast.error(erro);
-                                    return;
+                                toast.error(erro);
+                                return;
                                 }
 
-                                setErroConfirmarSenha('');
-
                                 if (editingIndex !== null) {
-                                    editUsuario(editingIndex, newUsuario);
-                                    toast.success("Usuário atualizado com sucesso!");
+                                editUsuario(editingIndex, newUsuario);
+                                toast.success("Usuário atualizado com sucesso!");
                                 } else {
-                                    addNewUsuario();
-                                    toast.success("Usuário cadastrado com sucesso!");
+                                addNewUsuario();
+                                toast.success("Usuário cadastrado com sucesso!");
                                 }
 
                                 setEditingIndex(null);
                                 setShowUsuariosForm(false);
                             }}
                         >
-
 
                             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
 

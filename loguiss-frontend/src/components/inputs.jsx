@@ -22,7 +22,7 @@ export function Inputs({
                     mostrarErro ? "border-red-500" : "border-gray-200"
                 } ${className}`}
             >
-                {Icon && <Icon size={20} />}
+                {Icon && <Icon size={20} className="text-gray-400" />}
 
                 {type === "select" ? (
                     <select
