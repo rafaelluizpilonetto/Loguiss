@@ -7,7 +7,7 @@ import { Button } from '../components/Button';
 import { ButtonEye } from '../components/ButtonEye';
 import { Inputs } from '../components/Inputs';
 
-import api_login from '../services/api_login.js';
+import api_login from '../services/api.js';
 
 function Login() {
 
@@ -32,7 +32,7 @@ function Login() {
             return;
         }
         try {
-            const resposta_login = await api_login.post('/login', {
+            const resposta_login = await api_login.post('/login/login', {
                 email: email,
                 senha: senha
             })

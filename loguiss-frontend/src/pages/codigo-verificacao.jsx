@@ -2,7 +2,7 @@ import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/Button';
 
-import api from '../services/api_login.js'
+import api from '../services/api.js'
 
 function CodigoVerificacao() {
 
@@ -66,7 +66,7 @@ function CodigoVerificacao() {
         console.log(localStorage.getItem("token"))
 
         try {
-            const resposta = await api.post('/verify_cod', {
+            const resposta = await api.post('/login/verify_cod', {
                 token_email: localStorage.getItem("token"),
                 user_cod_verify: codigoArray
             })

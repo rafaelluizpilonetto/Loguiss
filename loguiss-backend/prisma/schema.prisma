@@ -7,135 +7,118 @@ datasource db {
 }
 
 model user {
-  id_user      Int    @id @default(autoincrement())
-  nome_usuario String
-  email        String @unique
-  senha        String
-  cpf          String @unique
-  senha_pdv    String
-  tipo_user    String
-  telefone     String
-  email_verificado Boolean @default(false)
-
-  verificacao verificacao_user?
+  id_user          Int               @id @default(autoincrement())
+  nome_usuario     String
+  email            String            @unique
+  senha            String
+  cpf              String            @unique
+  senha_pdv        String
+  tipo_user        String
+  telefone         String
+  email_verificado Boolean           @default(false)
+  verificacao      verificacao_user?
 }
+
 model verificacao_user {
-  id_verificacao   String   @id @default(uuid())
-
-  cod_verify       String?
-  expira_em   DateTime?
-
-  id_user    Int      @unique
-  usuario    user     @relation(fields: [id_user], references: [id_user], onDelete: Cascade)
+  expira_em      DateTime?
+  id_user        Int       @unique
+  id_verificacao String    @id @default(uuid())
+  cod_verify     String?
+  usuario        user      @relation(fields: [id_user], references: [id_user], onDelete: Cascade)
 }
-model unidade_medida {
-  id_unidade    Int      @id @default(autoincrement())
-  descrunidade  String
-  nomenclatura  String
-  flag_ativo    String?   @default("T")
-  created_at    DateTime? @default(now())
-  updated_at    DateTime? @updatedAt
 
-  produtos produto[]
-  receitas  receita_produto[]
+model unidade_medida {
+  id_unidade   Int               @id @default(autoincrement())
+  descrunidade String
+  nomenclatura String
+  created_at   DateTime?         @default(now())
+  flag_ativo   String?           @default("T")
+  updated_at   DateTime?         @updatedAt
+  produtos     produto[]
+  receitas     receita_produto[]
 }
 
 model categoria {
-  id_categoria Int      @id @default(autoincrement())
-  descricao    String
-  flag_ativo   String   @default("T")
-  created_at   DateTime @default(now())
-  updated_at   DateTime @updatedAt
-
+  id_categoria       Int                 @id @default(autoincrement())
+  descricao          String
+  flag_ativo         String              @default("T")
+  created_at         DateTime            @default(now())
+  updated_at         DateTime            @updatedAt
   produtos_categoria produto_categoria[]
 }
 
 model produto_categoria {
-  id_produto_categoria Int @id @default(autoincrement())
+  id_produto_categoria Int       @id @default(autoincrement())
   id_produto           Int
   id_categoria         Int
-
-  produto   produto   @relation(fields: [id_produto], references: [id_produto])
-  categoria categoria @relation(fields: [id_categoria], references: [id_categoria])
+  categoria            categoria @relation(fields: [id_categoria], references: [id_categoria])
+  produto              produto   @relation(fields: [id_produto], references: [id_produto])
 
   @@unique([id_produto, id_categoria])
 }
 
 model tipo_produto {
-  id_tipo_produto Int      @id @default(autoincrement())
+  id_tipo_produto Int       @id @default(autoincrement())
   descricao       String
-  flag_tipo       String?
-  flag_ativo      String   @default("T")
-  created_at      DateTime @default(now())
+  flag_ativo      String    @default("T")
+  created_at      DateTime  @default(now())
   updated_at      DateTime? @updatedAt
-
-  produtos produto[]
+  flag_tipo       String?
+  produtos        produto[]
 }
 
 model produto {
-  id_produto        Int      @id @default(autoincrement())
+  id_produto        Int                    @id @default(autoincrement())
   descricao         String
-
   id_tipo_produto   Int
   id_unidade_medida Int
-
+  flag_ativo        String                 @default("T")
+  created_at        DateTime               @default(now())
+  updated_at        DateTime               @updatedAt
   valor             Decimal
-
-  flag_ativo        String   @default("T")
-  created_at        DateTime @default(now())
-  updated_at        DateTime @updatedAt
-
-  tipo_produto      tipo_produto   @relation(fields: [id_tipo_produto], references: [id_tipo_produto])
-  unidade_medida    unidade_medida @relation(fields: [id_unidade_medida], references: [id_unidade])
-
+  estoque           estoque?
+  fornecedores      fornecedor_produto[]
+  movimentacoes     movimentacao_estoque[]
+  tipo_produto      tipo_produto           @relation(fields: [id_tipo_produto], references: [id_tipo_produto])
+  unidade_medida    unidade_medida         @relation(fields: [id_unidade_medida], references: [id_unidade])
   categorias        produto_categoria[]
   receitas          receita_produto[]
-  movimentacoes     movimentacao_estoque[]
-  fornecedores      fornecedor_produto[]
-
-  estoque           estoque?
 }
+
 model estoque {
-  id_estoque      Int      @id @default(autoincrement())
-  id_produto      Int      @unique
-
-  quantidade      Decimal  @default(0)
-  minimo          Decimal  @default(0)
-  is_fracionado   String   @default("F")
-
-  dt_entrada      DateTime?
-  prazo_saida     DateTime?
-
-  produto         produto  @relation(fields: [id_produto], references: [id_produto], onDelete: Cascade)
-
-  created_at      DateTime @default(now())
-  updated_at      DateTime @updatedAt
+  id_estoque    Int       @id @default(autoincrement())
+  id_produto    Int       @unique
+  quantidade    Decimal   @default(0)
+  minimo        Decimal   @default(0)
+  is_fracionado String    @default("F")
+  dt_entrada    DateTime?
+  prazo_saida   DateTime?
+  created_at    DateTime  @default(now())
+  updated_at    DateTime  @updatedAt
+  produto       produto   @relation(fields: [id_produto], references: [id_produto], onDelete: Cascade)
 }
-
 
 model receita {
-  id_receita           Int      @id @default(autoincrement())
+  id_receita           Int               @id @default(autoincrement())
   descricao            String
-  margem_perda         Decimal  @default(0)
-  quantidade_produzida Decimal  @default(0)
-  quantidade_perdida   Decimal  @default(0)
-  flag_ativo           String   @default("T")
-  created_at           DateTime @default(now())
-  updated_at           DateTime @updatedAt
-
-  produtos receita_produto[]
+  flag_ativo           String            @default("T")
+  created_at           DateTime          @default(now())
+  updated_at           DateTime          @updatedAt
+  margem_perda         Decimal           @default(0)
+  quantidade_perdida   Decimal           @default(0)
+  quantidade_produzida Decimal           @default(0)
+  produtos             receita_produto[]
 }
 
 model receita_produto {
-  id_receita_produto Int      @id @default(autoincrement())
+  id_receita_produto Int            @id @default(autoincrement())
   id_receita         Int
   id_produto         Int
   quantidade         Decimal
   id_unidade         Int
-
-  receita       receita        @relation(fields: [id_receita], references: [id_receita])
-  produto       produto        @relation(fields: [id_produto], references: [id_produto])
-  unidade_medida unidade_medida @relation(fields: [id_unidade], references: [id_unidade])
+  produto            produto        @relation(fields: [id_produto], references: [id_produto])
+  receita            receita        @relation(fields: [id_receita], references: [id_receita])
+  unidade_medida     unidade_medida @relation(fields: [id_unidade], references: [id_unidade])
 
   @@unique([id_receita, id_produto])
 }
@@ -148,51 +131,50 @@ model movimentacao_estoque {
   saldo_final     Decimal
   data_movimento  DateTime @default(now())
   observacao      String?
-
-  produto produto @relation(fields: [id_produto], references: [id_produto])
+  produto         produto  @relation(fields: [id_produto], references: [id_produto])
 
   @@index([id_produto])
   @@index([data_movimento])
 }
+
 model endereco {
-  id_endereco Int    @id @default(autoincrement())
+  id_endereco Int          @id @default(autoincrement())
   rua         String
   bairro      String
   numero      String
   estado      String
-
-  fornecedor fornecedor[]
-  cliente    cliente[]
+  cliente     cliente[]
+  fornecedor  fornecedor[]
 }
+
 model fornecedor {
-  id_fornecedor Int    @id @default(autoincrement())
-  cnpj          String @unique
+  id_fornecedor Int                  @id @default(autoincrement())
+  cnpj          String               @unique
   nome          String
   id_endereco   Int
   email         String
   telefone      String
-
-  endereco endereco @relation(fields: [id_endereco], references: [id_endereco])
-  produtos  fornecedor_produto[]
+  endereco      endereco             @relation(fields: [id_endereco], references: [id_endereco])
+  produtos      fornecedor_produto[]
 }
+
 model fornecedor_produto {
-  id_fornecedor_produto Int     @id @default(autoincrement())
+  id_fornecedor_produto Int        @id @default(autoincrement())
   id_fornecedor         Int
   id_produto            Int
   quantidade            Decimal
-
-  fornecedor fornecedor @relation(fields: [id_fornecedor], references: [id_fornecedor])
-  produto    produto    @relation(fields: [id_produto], references: [id_produto])
+  fornecedor            fornecedor @relation(fields: [id_fornecedor], references: [id_fornecedor])
+  produto               produto    @relation(fields: [id_produto], references: [id_produto])
 
   @@unique([id_fornecedor, id_produto])
 }
+
 model cliente {
-  id_cliente  Int    @id @default(autoincrement())
+  id_cliente  Int       @id @default(autoincrement())
   nome        String
-  cpf         String @unique
+  cpf         String    @unique
   email       String?
   telefone    String?
   id_endereco Int?
-
-  endereco endereco? @relation(fields: [id_endereco], references: [id_endereco])
+  endereco    endereco? @relation(fields: [id_endereco], references: [id_endereco])
 }

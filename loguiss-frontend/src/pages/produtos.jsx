@@ -8,10 +8,7 @@ import { Button } from '../components/Button'
 import { Inputs } from '../components/Inputs';
 import { Card } from '../components/Card';
 
-import api_produto from '../services/api_produto';
-import api_fornecedor from '../services/api_fornecedor';
-import api_categoria from '../services/api_categoria';
-import api_unidade from '../services/api_unidades';
+import api from '../services/api';
 
 function Produtos() {
 
@@ -27,10 +24,10 @@ function Produtos() {
     const [searchTerm, setSearchTerm] = useState("");
     const [appliedSearch, setAppliedSearch] = useState("");
     const [editingIndex, setEditingIndex] = useState(null);
-    const filteredProducts = products
+    const filteredProducts = (products ?? [])
         .map((produto, index) => ({ produto, index }))
         .filter(({ produto }) => {
-            const texto = (produto.desc ?? produto.descricao ?? produto.nome ?? "").toLowerCase();
+            const texto = (produto.descricao ?? "").toLowerCase();
             return texto.includes(appliedSearch.toLowerCase());
         });
 
@@ -63,23 +60,23 @@ function Produtos() {
     });
 
     const produto_api = async () => {
-        const produtos = await api_produto.get('/list_produtos')
+        const produtos = await api.get('/produto/list_produtos')
         setProducts(produtos.data.produtos)
         console.log(produtos)
     }
     const fornecedor_api = async () => {
-        const fornecedores = await api_fornecedor.get('/list_fornecedor');
+        const fornecedores = await api.get('/fornecedor/list_fornecedor');
         setFornecedores(fornecedores.data.fornecedores)
 
     }
     const categoria_api = async () => {
-        const categorias = await api_categoria.get('/list_categorias');
+        const categorias = await api.get('/categoria/list_categorias');
         setCategorias(categorias.data.categorias)
         console.log(categorias.data.categorias)
         // console.log(categorias)
     }
     const unidade_api = async () => {
-        const unidades = await api_unidade.get('/list_unidade_medida');
+        const unidades = await api.get('/unidade_medida/list_unidade_medida');
         setUnidades(unidades.data.unidades)
     }
 

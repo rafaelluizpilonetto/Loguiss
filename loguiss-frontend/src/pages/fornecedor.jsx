@@ -9,7 +9,7 @@ import { SideBar } from '../components/Sidebar';
 import { Button } from '../components/Button';
 import { Inputs } from '../components/Inputs';
 import { Card } from '../components/Card';
-import api_fornecedor from '../services/api_fornecedor';
+import api from '../services/api';
 
 function Fornecedor() {
 
@@ -40,7 +40,7 @@ function Fornecedor() {
     });
 
     const fornecedores_api = async () => {
-        const Fornecedores = await api_fornecedor.get('/list_fornecedor')
+        const Fornecedores = await api.get('/fornecedor/list_fornecedor')
         console.log(Fornecedores.data.fornecedores)
         setFornecedores(Fornecedores.data.fornecedores)
     }
@@ -50,7 +50,7 @@ function Fornecedor() {
 
     const addNewFornecedor = async () => {
 
-        const create_fornecedor = await api_fornecedor.post('/create_fornecedor', {
+        const create_fornecedor = await api.post('/fornecedor/create_fornecedor', {
             cnpj: newFornecedor.cnpj,
             nome: newFornecedor.nome,
             rua: newFornecedor.endereco.rua,

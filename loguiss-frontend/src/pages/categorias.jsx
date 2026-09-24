@@ -7,7 +7,7 @@ import { Button } from '../components/Button'
 import { Inputs } from '../components/Inputs';
 import { Card } from '../components/Card';
 
-import api_categoria from '../services/api_categoria';
+import api from '../services/api';
 
 function Categorias() {
 
@@ -39,7 +39,7 @@ function Categorias() {
             toast.success("Categoria cadastrada com sucesso!");
         }
 
-        const create_categoria = await api_categoria.post('/create_categoria', {
+        const create_categoria = await api.post('/categoria/create_categoria', {
             descricao: newCategory.desc
         })
         categoria_api();
@@ -65,7 +65,7 @@ function Categorias() {
     };
 
     const categoria_api = async () => {
-        const categorias = await api_categoria.get('/list_categorias')
+        const categorias = await api.get('/categoria/list_categorias')
         setCategories(categorias.data.categorias)
     }
 
