@@ -4,7 +4,6 @@ import { prisma } from '../../database.js';
 
 const chave_jwt = process.env.CHAVE_JWT 
 
-
 export async function login (req,res) {
     const {email , senha} = req.body
 
