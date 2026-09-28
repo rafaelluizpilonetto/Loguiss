@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { toast } from 'sonner';
-import { Search } from 'lucide-react';
 
 import { SideBar } from '../components/Sidebar';
 import { Button } from '../components/Button';
@@ -11,6 +10,7 @@ const movimentacaoInicial = {
     id: null,
     dt_movimentacao: '',
     produto: {
+        desc: '',
         quantidade: '',
         fornecedor: '',
         valor: '',
@@ -24,43 +24,24 @@ const movimentacaoInicial = {
 function MovimentacaoSaida() {
     const [showMovimentacaoForm, setShowMovimentacaoForm] = useState(false);
     const [movimentacoes, setMovimentacoes] = useState([]);
-    const [searchTerm, setSearchTerm] = useState('');
-    const [appliedSearch, setAppliedSearch] = useState('');
-    const [editingIndex, setEditingIndex] = useState(null);
     const [newMovimentacao, setNewMovimentacao] = useState(movimentacaoInicial);
     const [proximoId, setProximoId] = useState(1);
 
-
-    const filteredMovimentacoes = movimentacoes
-        .map((movimentacao, index) => ({ movimentacao, index }))
-        .filter(({ movimentacao }) => {
-            const texto = [
-                movimentacao.dt_movimentacao,
-                movimentacao.produto.fornecedor,
-                movimentacao.cliente.desc,
-                movimentacao.cliente.cpf,
-            ]
-                .join(' ')
-                .toLowerCase();
-
-            return texto.includes(appliedSearch.toLowerCase());
-        });
-
-    const atualizarProduto = (campo, valor) => {
-        setNewMovimentacao((atual) => ({
-            ...atual,
-            produto: {
-                ...atual.produto,
+    const atualizarCliente = (campo, valor) => {
+        setNewMovimentacao((prev) => ({
+            ...prev,
+            cliente: {
+                ...prev.cliente,
                 [campo]: valor,
             },
         }));
     };
 
-    const atualizarCliente = (campo, valor) => {
-        setNewMovimentacao((atual) => ({
-            ...atual,
-            cliente: {
-                ...atual.cliente,
+    const atualizarProduto = (campo, valor) => {
+        setNewMovimentacao((prev) => ({
+            ...prev,
+            produto: {
+                ...prev.produto,
                 [campo]: valor,
             },
         }));
@@ -68,158 +49,156 @@ function MovimentacaoSaida() {
 
     const fecharFormulario = () => {
         setShowMovimentacaoForm(false);
-        setEditingIndex(null);
         setNewMovimentacao(movimentacaoInicial);
     };
 
     const salvarMovimentacao = (event) => {
         event.preventDefault();
 
-        if (editingIndex !== null) {
-            setMovimentacoes((atuais) =>
-                atuais.map((item, index) =>
-                    index === editingIndex ? newMovimentacao : item,
-                ),
-            );
+        const movimentacaoComId = {
+            ...newMovimentacao,
+            id: proximoId,
+        };
 
-            toast.success('Movimentação atualizada com sucesso!');
-        } else {
-            const movimentacaoComId = {
-                ...newMovimentacao,
-                id: proximoId,
-            };
+        setMovimentacoes((atuais) => [...atuais, movimentacaoComId]);
+        setProximoId((atual) => atual + 1);
 
-            setMovimentacoes((atuais) => [
-                ...atuais,
-                movimentacaoComId,
-            ]);
-
-            setProximoId((atual) => atual + 1);
-            toast.success('Movimentação cadastrada com sucesso!');
-        }
-
+        toast.success('Movimentação cadastrada com sucesso!');
         fecharFormulario();
     };
 
     return (
         <div className="min-h-screen bg-[#050212] text-white">
+
             <SideBar />
 
             <main className="ml-72 min-h-screen p-5">
+
                 <div className="mb-3 flex items-center justify-between">
+
                     <div>
+
                         <h1 className="mt-2 mb-2 text-3xl font-bold">
                             Movimentações de saída
                         </h1>
+
                         <p className="text-gray-400">
                             Gerencie as movimentações de saída realizadas no sistema.
                         </p>
+
                     </div>
 
                     <Button
                         type="button"
                         className="mt-2 w-auto bg-[#4EDB4E] p-3 hover:bg-[#3CB43C]"
                         onClick={() => {
-                            setEditingIndex(null);
                             setNewMovimentacao(movimentacaoInicial);
                             setShowMovimentacaoForm(true);
                         }}
                     >
                         Adicionar movimentação
                     </Button>
-                </div>
-
-                <Inputs
-                    type="text"
-                    placeholder="Pesquisar..."
-                    value={searchTerm}
-                    onChange={(event) => setSearchTerm(event.target.value)}
-                    onKeyDown={(event) => {
-                        if (event.key === 'Enter') {
-                            event.preventDefault();
-                            setAppliedSearch(searchTerm.trim());
-                        }
-                    }}
-                    className="mt-5 w-1/2 rounded-lg border bg-[#15102b] p-3 focus:border-[#4EDB4E]"
-                    icon={Search}
-                />
-
-                <div className="mt-5 grid grid-cols-[110px_250px_110px_130px_230px_1fr] gap-1 border-2 border-gray-300 rounded-lg bg-[#15102b]">
-
-                    <div className="px-4 py-2 text-center">
-                        Id
-                    </div>
-
-                    <div className="px-4 py-2 text-center">
-                        Produto
-                    </div>
-
-                    <div className="px-4 py-2 text-center">
-                        Quantidade
-                    </div>
-
-                    <div className="px-4 py-2 text-center">
-                        Valor
-                    </div>
-
-                    <div className="px-4 py-2 text-center">
-                        Data da movimentação
-                    </div>
-
-                    <div className="px-4 py-2 text-center">
-                        Cliente
-                    </div>
 
                 </div>
 
-                <div className="mt-3 flex flex-col gap-2">
-                    {filteredMovimentacoes.map(({ movimentacao, index }) => (
-                        <div
-                            key={movimentacao.id}
-                            className="grid grid-cols-[110px_250px_110px_130px_230px_1fr] items-center gap-1"
-                        >
-                            <div className="rounded-lg bg-[#15102b] px-4 py-4 text-center">
-                                {movimentacao.id}
-                            </div>
+                <div className="mt-5 overflow-hidden rounded-lg border-2 border-gray-500">
 
-                            <div className="rounded-lg bg-[#15102b] px-4 py-4 text-center">
-                                {movimentacao.produto.fornecedor}
-                            </div>
+                    <div className="grid grid-cols-[110px_250px_110px_130px_230px_1fr] justify-items-start gap-1 border-b border-gray-500 bg-[#15102b] p-1">
 
-                            <div className="rounded-lg bg-[#15102b] px-4 py-4 text-center">
-                                {movimentacao.produto.quantidade}
-                            </div>
-
-                            <div className="rounded-lg bg-[#15102b] px-4 py-4 text-center">
-                                R$ {Number(movimentacao.produto.valor).toFixed(2)}
-                            </div>
-
-                            <div className="rounded-lg bg-[#15102b] px-4 py-4 text-center">
-                                {movimentacao.dt_movimentacao}
-                            </div>
-
-                            <div className="rounded-lg bg-[#15102b] px-4 py-4 text-center">
-                                {movimentacao.cliente.desc}
-                            </div>
-
+                        <div className="px-4 py-2">
+                            Id
                         </div>
-                    ))}
+
+                        <div className="px-4 py-2">
+                            Produto
+                        </div>
+
+                        <div className="px-4 py-2">
+                            Qtd.
+                        </div>
+
+                        <div className="px-4 py-2">
+                            Valor
+                        </div>
+
+                        <div className="px-4 py-2">
+                            Data da movimentação
+                        </div>
+
+                        <div className="px-4 py-2">
+                            Cliente
+                        </div>
+
+                    </div>
+
+                    {/* Movimentações */}
+                    <div className="flex flex-col gap-2 bg-[#08031a]">
+
+                        {movimentacoes.length === 0 ? (
+                            <div className="px-4 py-8 text-center text-gray-400">
+                                Nenhuma movimentação encontrada.
+                            </div>
+                        ) : (
+                            movimentacoes.map((movimentacao) => (
+                                <div
+                                    key={movimentacao.id}
+                                    className="grid grid-cols-[110px_250px_110px_130px_230px_1fr] justify-items-start gap-1 p-1"
+                                >
+
+                                    <div className="px-4 py-4 text-gray-200">
+                                        {movimentacao.id}
+                                    </div>
+
+                                    <div className="w-full min-w-0 truncate px-4 py-4 text-gray-200">
+                                        {movimentacao.produto.desc}
+                                    </div>
+
+                                    <div className="px-4 py-4">
+                                        <span className="rounded-lg bg-[#21183d] px-3 py-1 text-gray-200">
+                                            {movimentacao.produto.quantidade}
+                                        </span>
+                                    </div>
+
+                                    <div className="px-4 py-4 text-green-500">
+                                        R$ {Number(movimentacao.produto.valor).toFixed(2)}
+                                    </div>
+
+                                    <div className="px-4 py-4 text-gray-200">
+                                        {movimentacao.dt_movimentacao}
+                                    </div>
+
+                                    <div className="w-full min-w-0 truncate px-4 py-4 text-gray-200">
+                                        {movimentacao.cliente.desc}
+                                    </div>
+
+                                </div>
+                            ))
+                        )}
+
+                    </div>
+
                 </div>
+
             </main>
 
             {showMovimentacaoForm && (
+
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4 backdrop-blur-sm">
+
                     <div className="w-full max-w-2xl rounded-lg bg-[#050210] p-6 shadow-2xl">
+
                         <div className="mb-6 flex items-center justify-between">
+
                             <div>
+
                                 <h2 className="text-2xl font-bold">
-                                    {editingIndex !== null
-                                        ? 'Editar movimentação'
-                                        : 'Adicionar movimentação'}
+                                    Adicionar movimentação
                                 </h2>
+
                                 <p className="mt-1 text-sm text-gray-400">
                                     Preencha os dados da movimentação de saída.
                                 </p>
+
                             </div>
 
                             <button
@@ -229,14 +208,19 @@ function MovimentacaoSaida() {
                             >
                                 ×
                             </button>
+
                         </div>
 
                         <form onSubmit={salvarMovimentacao}>
+
                             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+
                                 <div>
+
                                     <label className="mb-1 block text-sm font-medium">
                                         Data da movimentação
                                     </label>
+
                                     <input
                                         type="date"
                                         value={newMovimentacao.dt_movimentacao}
@@ -249,12 +233,15 @@ function MovimentacaoSaida() {
                                         className="w-full rounded-lg border border-gray-700 bg-[#15102b] p-3 text-white outline-none focus:border-[#4EDB4E]"
                                         required
                                     />
+
                                 </div>
 
                                 <div>
+
                                     <label className="mb-1 block text-sm font-medium">
                                         Cliente
                                     </label>
+
                                     <Inputs
                                         type="text"
                                         value={newMovimentacao.cliente.desc}
@@ -262,31 +249,37 @@ function MovimentacaoSaida() {
                                             atualizarCliente('desc', event.target.value)
                                         }
                                         placeholder="Nome do cliente"
-                                        className="w-full rounded-lg border border-gray-700 bg-[#15102b] p-3"
+                                        className="w-full rounded-lg border border-gray-700 bg-[#15102b] p-3 text-white outline-none focus:border-[#4EDB4E]"
                                         required
                                     />
+
                                 </div>
 
                                 <div>
+
                                     <label className="mb-1 block text-sm font-medium">
                                         Produto
                                     </label>
+
                                     <Inputs
                                         type="text"
-                                        value={newMovimentacao.produto.fornecedor}
+                                        value={newMovimentacao.produto.desc}
                                         onChange={(event) =>
-                                            atualizarProduto('fornecedor', event.target.value)
+                                            atualizarProduto('desc', event.target.value)
                                         }
                                         placeholder="Nome do produto"
-                                        className="w-full rounded-lg border border-gray-700 bg-[#15102b] p-3"
+                                        className="w-full rounded-lg border border-gray-700 bg-[#15102b] p-3 focus:border-[#4EDB4E]"
                                         required
                                     />
+
                                 </div>
 
                                 <div>
+
                                     <label className="mb-1 block text-sm font-medium">
                                         Quantidade
                                     </label>
+
                                     <Inputs
                                         type="number"
                                         min="1"
@@ -295,15 +288,18 @@ function MovimentacaoSaida() {
                                             atualizarProduto('quantidade', event.target.value)
                                         }
                                         placeholder="Quantidade"
-                                        className="w-full rounded-lg border border-gray-700 bg-[#15102b] p-3"
+                                        className="w-full rounded-lg border border-gray-700 bg-[#15102b] p-3 focus:border-[#4EDB4E]"
                                         required
                                     />
+
                                 </div>
 
                                 <div>
+
                                     <label className="mb-1 block text-sm font-medium">
                                         Valor
                                     </label>
+
                                     <Inputs
                                         type="number"
                                         min="0"
@@ -313,15 +309,18 @@ function MovimentacaoSaida() {
                                             atualizarProduto('valor', event.target.value)
                                         }
                                         placeholder="R$ 0,00"
-                                        className="w-full rounded-lg border border-gray-700 bg-[#15102b] p-3"
+                                        className="w-full rounded-lg border border-gray-700 bg-[#15102b] p-3 focus:border-[#4EDB4E]"
                                         required
                                     />
+
                                 </div>
 
                                 <div>
+
                                     <label className="mb-1 block text-sm font-medium">
                                         CPF/CNPJ do cliente
                                     </label>
+
                                     <Inputs
                                         type="text"
                                         value={newMovimentacao.cliente.cpf}
@@ -332,13 +331,16 @@ function MovimentacaoSaida() {
                                             )
                                         }
                                         placeholder="CPF ou CNPJ"
-                                        className="w-full rounded-lg border border-gray-700 bg-[#15102b] p-3"
+                                        className="w-full rounded-lg border border-gray-700 bg-[#15102b] p-3 focus:border-[#4EDB4E]"
                                         required
                                     />
+
                                 </div>
+
                             </div>
 
                             <div className="mt-6 flex justify-end gap-3">
+
                                 <button
                                     type="button"
                                     onClick={fecharFormulario}
@@ -351,15 +353,19 @@ function MovimentacaoSaida() {
                                     type="submit"
                                     className="mt-0 w-auto bg-[#4EDB4E] px-5 py-3 hover:bg-[#3CB43C]"
                                 >
-                                    {editingIndex !== null
-                                        ? 'Salvar alterações'
-                                        : 'Cadastrar movimentação'}
+                                    Cadastrar movimentação
                                 </Button>
+
                             </div>
+
                         </form>
+
                     </div>
+
                 </div>
+
             )}
+
         </div>
     );
 }
