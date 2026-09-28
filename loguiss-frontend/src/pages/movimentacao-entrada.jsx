@@ -3,6 +3,7 @@ import { toast } from 'sonner';
 
 import { SideBar } from '../components/Sidebar';
 import { Button } from '../components/Button';
+import { ButtonEye } from '../components/buttonEye';
 import { Inputs } from '../components/Inputs';
 import { formatarCPFCNPJ } from '../utils/validacoes';
 
@@ -51,6 +52,11 @@ function MovimentacaoEntrada() {
     const fecharFormulario = () => {
         setShowMovimentacaoForm(false);
         setNewMovimentacao(movimentacaoInicial);
+    };
+
+    const abrirFormulario = (movimentacao) => {
+        setNewMovimentacao(movimentacao);
+        setShowMovimentacaoForm(true);
     };
 
     const salvarMovimentacao = (event) => {
@@ -143,7 +149,7 @@ function MovimentacaoEntrada() {
                             movimentacoes.map((movimentacao) => (
                                 <div
                                     key={movimentacao.id}
-                                    className="grid grid-cols-[110px_250px_110px_130px_230px_1fr] justify-items-start gap-1 p-1"
+                                    className="grid grid-cols-[110px_250px_110px_130px_230px_1fr_110px] justify-items-start gap-1 p-1"
                                 >
 
                                     <div className="px-4 py-4 text-gray-200">
@@ -170,6 +176,14 @@ function MovimentacaoEntrada() {
 
                                     <div className="w-full min-w-0 truncate px-4 py-4 text-gray-200">
                                         {movimentacao.fornecedor.desc}
+                                    </div>
+
+                                    <div className="w-full min-w-0 px-4 py-4 text-gray-200">
+                                            <ButtonEye
+                                                isOpen={showMovimentacaoForm && newMovimentacao?.id === movimentacao.id}
+                                                onClick={() => abrirFormulario(movimentacao)}
+                                                title="Visualizar movimentação"
+                                            />
                                     </div>
 
                                 </div>

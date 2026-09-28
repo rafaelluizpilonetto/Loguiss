@@ -3,6 +3,7 @@ import { toast } from 'sonner';
 
 import { SideBar } from '../components/Sidebar';
 import { Button } from '../components/Button';
+import { ButtonEye } from '../components/buttonEye';
 import { Inputs } from '../components/Inputs';
 import { formatarCPFCNPJ } from '../utils/validacoes';
 
@@ -65,6 +66,11 @@ function MovimentacaoSaida() {
 
         toast.success('Movimentação cadastrada com sucesso!');
         fecharFormulario();
+    };
+
+    const abrirFormulario = (movimentacao) => {
+        setNewMovimentacao(movimentacao);
+        setShowMovimentacaoForm(true);
     };
 
     return (
@@ -132,50 +138,54 @@ function MovimentacaoSaida() {
                     </div>
 
                     {/* Movimentações */}
-                    <div className="flex flex-col gap-2 bg-[#08031a]">
-
-                        {movimentacoes.length === 0 ? (
-                            <div className="px-4 py-8 text-center text-gray-400">
-                                Nenhuma movimentação encontrada.
-                            </div>
-                        ) : (
-                            movimentacoes.map((movimentacao) => (
-                                <div
-                                    key={movimentacao.id}
-                                    className="grid grid-cols-[110px_250px_110px_130px_230px_1fr] justify-items-start gap-1 p-1"
-                                >
-
-                                    <div className="px-4 py-4 text-gray-200">
-                                        {movimentacao.id}
-                                    </div>
-
-                                    <div className="w-full min-w-0 truncate px-4 py-4 text-gray-200">
-                                        {movimentacao.produto.desc}
-                                    </div>
-
-                                    <div className="px-4 py-4">
-                                        <span className="rounded-lg bg-[#21183d] px-3 py-1 text-gray-200">
-                                            {movimentacao.produto.quantidade}
-                                        </span>
-                                    </div>
-
-                                    <div className="px-4 py-4 text-green-500">
-                                        R$ {Number(movimentacao.produto.valor).toFixed(2)}
-                                    </div>
-
-                                    <div className="px-4 py-4 text-gray-200">
-                                        {movimentacao.dt_movimentacao}
-                                    </div>
-
-                                    <div className="w-full min-w-0 truncate px-4 py-4 text-gray-200">
-                                        {movimentacao.cliente.desc}
-                                    </div>
-
+                    <div className="flex flex-col gap-2 bg-[#08031a]">  
+                            {movimentacoes.length === 0 ? (
+                                <div className="px-4 py-8 text-center text-gray-400">
+                                    Nenhuma movimentação encontrada.
                                 </div>
-                            ))
-                        )}
+                            ) : (
+                                movimentacoes.map((movimentacao) => (
+                                    <div
+                                        key={movimentacao.id}
+                                        className="grid grid-cols-[110px_250px_110px_130px_230px_1fr_110px] justify-items-start gap-1 p-1 border-b border-gray-500"
+                                    >
+                                        <div className="px-4 py-4 text-gray-200">
+                                            {movimentacao.id}
+                                        </div>
 
-                    </div>
+                                        <div className="w-full min-w-0 truncate px-4 py-4 text-gray-200">
+                                            {movimentacao.produto.desc}
+                                        </div>
+
+                                        <div className="px-4 py-4">
+                                            <span className="rounded-lg bg-[#21183d] px-3 py-1 text-gray-200">
+                                                {movimentacao.produto.quantidade}
+                                            </span>
+                                        </div>
+
+                                        <div className="px-4 py-4 text-green-500">
+                                            R$ {Number(movimentacao.produto.valor).toFixed(2)}
+                                        </div>
+
+                                        <div className="px-4 py-4 text-gray-200">
+                                            {movimentacao.dt_movimentacao}
+                                        </div>
+
+                                        <div className="w-full min-w-0 truncate px-4 py-4 text-gray-200">
+                                            {movimentacao.cliente.desc}
+                                        </div>
+
+                                        <div className="w-full min-w-0 px-4 py-4 text-gray-200">
+                                            <ButtonEye
+                                                isOpen={showMovimentacaoForm && newMovimentacao?.id === movimentacao.id}
+                                                onClick={() => abrirFormulario(movimentacao)}
+                                                title="Visualizar movimentação"
+                                            />
+                                        </div>
+                                    </div>
+                                ))
+                            )}
+                        </div>
 
                 </div>
 
