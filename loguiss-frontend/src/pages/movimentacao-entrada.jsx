@@ -26,6 +26,7 @@ const movimentacaoInicial = {
 function MovimentacaoEntrada() {
     const [showMovimentacaoForm, setShowMovimentacaoForm] = useState(false);
     const [movimentacoes, setMovimentacoes] = useState([]);
+    const [visualizarMovimentacao, setVisualizarMovimentacao] = useState(false);
     const [newMovimentacao, setNewMovimentacao] = useState(movimentacaoInicial);
     const [proximoId, setProximoId] = useState(1);
 
@@ -51,11 +52,19 @@ function MovimentacaoEntrada() {
 
     const fecharFormulario = () => {
         setShowMovimentacaoForm(false);
+        setVisualizarMovimentacao(false);
         setNewMovimentacao(movimentacaoInicial);
     };
 
-    const abrirFormulario = (movimentacao) => {
+    const abrirFormularioNovo = () => {
+        setNewMovimentacao(movimentacaoInicial);
+        setVisualizarMovimentacao(false);
+        setShowMovimentacaoForm(true);
+    };
+
+    const abrirFormularioVisualizacao = (movimentacao) => {
         setNewMovimentacao(movimentacao);
+        setVisualizarMovimentacao(true);
         setShowMovimentacaoForm(true);
     };
 
@@ -98,10 +107,7 @@ function MovimentacaoEntrada() {
                     <Button
                         type="button"
                         className="mt-2 w-auto bg-[#4EDB4E] p-3 hover:bg-[#3CB43C]"
-                        onClick={() => {
-                            setNewMovimentacao(movimentacaoInicial);
-                            setShowMovimentacaoForm(true);
-                        }}
+                        onClick={abrirFormularioNovo}
                     >
                         Adicionar movimentação
                     </Button>
@@ -179,11 +185,11 @@ function MovimentacaoEntrada() {
                                     </div>
 
                                     <div className="w-full min-w-0 px-4 py-4 text-gray-200">
-                                            <ButtonEye
-                                                isOpen={showMovimentacaoForm && newMovimentacao?.id === movimentacao.id}
-                                                onClick={() => abrirFormulario(movimentacao)}
-                                                title="Visualizar movimentação"
-                                            />
+                                        <ButtonEye
+                                            isOpen={showMovimentacaoForm && newMovimentacao?.id === movimentacao.id}
+                                            onClick={() => abrirFormularioVisualizacao(movimentacao)}
+                                            title="Visualizar movimentação"
+                                        />
                                     </div>
 
                                 </div>
@@ -207,13 +213,15 @@ function MovimentacaoEntrada() {
                             <div>
 
                                 <h2 className="text-2xl font-bold">
-                                    Adicionar movimentação
+                                    {visualizarMovimentacao ? "Visualizar movimentação" : "Adicionar movimentação"}
                                 </h2>
 
                                 <p className="mt-1 text-sm text-gray-400">
-                                    Preencha os dados da movimentação de entrada.
+                                    {visualizarMovimentacao
+                                        ? "Visualize os dados da movimentação."
+                                        : "Preencha os dados da movimentação."}
                                 </p>
-
+                            
                             </div>
 
                             <button
@@ -228,149 +236,160 @@ function MovimentacaoEntrada() {
 
                         <form onSubmit={salvarMovimentacao}>
 
-                            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                            <fieldset disabled={visualizarMovimentacao}>
 
-                                <div>
+                                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
 
-                                    <label className="mb-1 block text-sm font-medium">
-                                        Data da movimentação
-                                    </label>
+                                    <div>
 
-                                    <input
-                                        type="date"
-                                        value={newMovimentacao.dt_movimentacao}
-                                        onChange={(event) =>
-                                            setNewMovimentacao({
-                                                ...newMovimentacao,
-                                                dt_movimentacao: event.target.value,
-                                            })
-                                        }
-                                        className="w-full rounded-lg border border-gray-700 bg-[#15102b] p-3 text-white outline-none focus:border-[#4EDB4E]"
-                                        required
-                                    />
+                                        <label className="mb-1 block text-sm font-medium">
+                                            Data da movimentação
+                                        </label>
+
+                                        <input
+                                            type="date"
+                                            disabled={visualizarMovimentacao}
+                                            value={newMovimentacao.dt_movimentacao}
+                                            onChange={(event) =>
+                                                setNewMovimentacao({
+                                                    ...newMovimentacao,
+                                                    dt_movimentacao: event.target.value,
+                                                })
+                                            }
+                                            className="w-full rounded-lg border border-gray-700 bg-[#15102b] p-3 text-white outline-none focus:border-[#4EDB4E] disabled:cursor-not-allowed disabled:opacity-70"
+                                            required
+                                        />
+
+                                    </div>
+
+                                    <div>
+
+                                        <label className="mb-1 block text-sm font-medium">
+                                            Fornecedor
+                                        </label>
+
+                                        <Inputs
+                                            type="text"
+                                            disabled={visualizarMovimentacao}
+                                            value={newMovimentacao.fornecedor.desc}
+                                            onChange={(event) =>
+                                                atualizarFornecedor('desc', event.target.value)
+                                            }
+                                            placeholder="Nome do fornecedor"
+                                            className="w-full rounded-lg border border-gray-700 bg-[#15102b] p-3 text-white outline-none focus:border-[#4EDB4E] disabled:cursor-not-allowed disabled:opacity-70"
+                                            required
+                                        />
+
+                                    </div>
+
+                                    <div>
+
+                                        <label className="mb-1 block text-sm font-medium">
+                                            Produto
+                                        </label>
+
+                                        <Inputs
+                                            type="text"
+                                            disabled={visualizarMovimentacao}
+                                            value={newMovimentacao.produto.desc}
+                                            onChange={(event) =>
+                                                atualizarProduto('desc', event.target.value)
+                                            }
+                                            placeholder="Nome do produto"
+                                            className="w-full rounded-lg border border-gray-700 bg-[#15102b] p-3 focus:border-[#4EDB4E] disabled:cursor-not-allowed disabled:opacity-70"
+                                            required
+                                        />
+
+                                    </div>
+
+                                    <div>
+
+                                        <label className="mb-1 block text-sm font-medium">
+                                            Prazo de chegada
+                                        </label>
+
+                                        <Inputs
+                                            type="date"
+                                            disabled={visualizarMovimentacao}
+                                            value={newMovimentacao.produto.prazo_chegada}
+                                            onChange={(event) =>
+                                                atualizarProduto('prazo_chegada', event.target.value)
+                                            }
+                                            className="w-full rounded-lg border border-gray-700 bg-[#15102b] p-3 focus:border-[#4EDB4E] disabled:cursor-not-allowed disabled:opacity-70"
+                                            required
+                                        />
+
+                                    </div>
+
+                                    <div>
+
+                                        <label className="mb-1 block text-sm font-medium">
+                                            Quantidade
+                                        </label>
+
+                                        <Inputs
+                                            type="number"
+                                            min="1"
+                                            disabled={visualizarMovimentacao}
+                                            value={newMovimentacao.produto.quantidade}
+                                            onChange={(event) =>
+                                                atualizarProduto('quantidade', event.target.value)
+                                            }
+                                            placeholder="Quantidade"
+                                            className="w-full rounded-lg border border-gray-700 bg-[#15102b] p-3 focus:border-[#4EDB4E] disabled:cursor-not-allowed disabled:opacity-70"
+                                            required
+                                        />
+
+                                    </div>
+
+                                    <div>
+
+                                        <label className="mb-1 block text-sm font-medium">
+                                            Valor
+                                        </label>
+
+                                        <Inputs
+                                            type="number"
+                                            min="0"
+                                            step="0.01"
+                                            disabled={visualizarMovimentacao}
+                                            value={newMovimentacao.produto.valor}
+                                            onChange={(event) =>
+                                                atualizarProduto('valor', event.target.value)
+                                            }
+                                            placeholder="R$ 0,00"
+                                            className="w-full rounded-lg border border-gray-700 bg-[#15102b] p-3 focus:border-[#4EDB4E] disabled:cursor-not-allowed disabled:opacity-70"
+                                            required
+                                        />
+
+                                    </div>
+
+                                    <div>
+
+                                        <label className="mb-1 block text-sm font-medium">
+                                            CPF/CNPJ do fornecedor
+                                        </label>
+
+                                        <Inputs
+                                            type="text"
+                                            disabled={visualizarMovimentacao}
+                                            value={newMovimentacao.fornecedor.cpf}
+                                            onChange={(event) =>
+                                                atualizarFornecedor(
+                                                    'cpf',
+                                                    formatarCPFCNPJ(event.target.value),
+                                                )
+                                            }
+                                            placeholder="CPF ou CNPJ"
+                                            className="w-full rounded-lg border border-gray-700 bg-[#15102b] p-3 focus:border-[#4EDB4E] disabled:cursor-not-allowed disabled:opacity-70"
+                                            required
+                                        />
+
+                                    </div>
 
                                 </div>
 
-                                <div>
-
-                                    <label className="mb-1 block text-sm font-medium">
-                                        Fornecedor
-                                    </label>
-
-                                    <Inputs
-                                        type="text"
-                                        value={newMovimentacao.fornecedor.desc}
-                                        onChange={(event) =>
-                                            atualizarFornecedor('desc', event.target.value)
-                                        }
-                                        placeholder="Nome do fornecedor"
-                                        className="w-full rounded-lg border border-gray-700 bg-[#15102b] p-3 text-white outline-none focus:border-[#4EDB4E]"
-                                        required
-                                    />
-
-                                </div>
-
-                                <div>
-
-                                    <label className="mb-1 block text-sm font-medium">
-                                        Produto
-                                    </label>
-
-                                    <Inputs
-                                        type="text"
-                                        value={newMovimentacao.produto.desc}
-                                        onChange={(event) =>
-                                            atualizarProduto('desc', event.target.value)
-                                        }
-                                        placeholder="Nome do produto"
-                                        className="w-full rounded-lg border border-gray-700 bg-[#15102b] p-3 focus:border-[#4EDB4E]"
-                                        required
-                                    />
-
-                                </div>
-
-                                <div>
-
-                                    <label className="mb-1 block text-sm font-medium">
-                                        Prazo de chegada
-                                    </label>
-
-                                    <Inputs
-                                        type="date"
-                                        value={newMovimentacao.produto.prazo_chegada}
-                                        onChange={(event) =>
-                                            atualizarProduto('prazo_chegada', event.target.value)
-                                        }
-                                        className="w-full rounded-lg border border-gray-700 bg-[#15102b] p-3 focus:border-[#4EDB4E]"
-                                        required
-                                    />
-
-                                </div>
-
-                                <div>
-
-                                    <label className="mb-1 block text-sm font-medium">
-                                        Quantidade
-                                    </label>
-
-                                    <Inputs
-                                        type="number"
-                                        min="1"
-                                        value={newMovimentacao.produto.quantidade}
-                                        onChange={(event) =>
-                                            atualizarProduto('quantidade', event.target.value)
-                                        }
-                                        placeholder="Quantidade"
-                                        className="w-full rounded-lg border border-gray-700 bg-[#15102b] p-3 focus:border-[#4EDB4E]"
-                                        required
-                                    />
-
-                                </div>
-
-                                <div>
-
-                                    <label className="mb-1 block text-sm font-medium">
-                                        Valor
-                                    </label>
-
-                                    <Inputs
-                                        type="number"
-                                        min="0"
-                                        step="0.01"
-                                        value={newMovimentacao.produto.valor}
-                                        onChange={(event) =>
-                                            atualizarProduto('valor', event.target.value)
-                                        }
-                                        placeholder="R$ 0,00"
-                                        className="w-full rounded-lg border border-gray-700 bg-[#15102b] p-3 focus:border-[#4EDB4E]"
-                                        required
-                                    />
-
-                                </div>
-
-                                <div>
-
-                                    <label className="mb-1 block text-sm font-medium">
-                                        CPF/CNPJ do fornecedor
-                                    </label>
-
-                                    <Inputs
-                                        type="text"
-                                        value={newMovimentacao.fornecedor.cpf}
-                                        onChange={(event) =>
-                                            atualizarFornecedor(
-                                                'cpf',
-                                                formatarCPFCNPJ(event.target.value),
-                                            )
-                                        }
-                                        placeholder="CPF ou CNPJ"
-                                        className="w-full rounded-lg border border-gray-700 bg-[#15102b] p-3 focus:border-[#4EDB4E]"
-                                        required
-                                    />
-
-                                </div>
-
-                            </div>
+                            </fieldset>
 
                             <div className="mt-6 flex justify-end gap-3">
 
@@ -379,15 +398,17 @@ function MovimentacaoEntrada() {
                                     onClick={fecharFormulario}
                                     className="rounded-lg bg-gray-700 px-5 py-3 font-bold hover:bg-gray-600"
                                 >
-                                    Cancelar
+                                    {visualizarMovimentacao ? "Fechar" : "Cancelar"}
                                 </button>
 
-                                <Button
-                                    type="submit"
-                                    className="mt-0 w-auto bg-[#4EDB4E] px-5 py-3 hover:bg-[#3CB43C]"
-                                >
-                                    Cadastrar movimentação
-                                </Button>
+                                {!visualizarMovimentacao && (
+                                    <Button
+                                        type="submit"
+                                        className="mt-0 w-auto bg-[#4EDB4E] px-5 py-3 hover:bg-[#3CB43C]"
+                                    >
+                                        Cadastrar movimentação
+                                    </Button>
+                                )}
 
                             </div>
 
