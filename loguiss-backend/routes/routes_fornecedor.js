@@ -12,5 +12,8 @@ router_fornecedor.get('/list_fornecedor', (req, res) =>{
 router_fornecedor.patch('/edit_fornecedor/:id_fornecedor', (req, res)=>{
     controller.edit_fornecedor(req, res)
 })
+router_fornecedor.delete('delete_fornecedor/:id_fornecedor', (req, res)=>{
+    controller.delete_fornecedor(req, res)
+})
 
 export default router_fornecedor;

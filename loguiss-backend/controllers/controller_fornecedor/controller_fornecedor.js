@@ -1,4 +1,5 @@
 import create_fornecedor_service from "../../services/fornecedor_service/create_fornecedor.service.js";
+import { delete_fornecedor_service } from "../../services/fornecedor_service/delete_fornecedor.service.js";
 import { edit_fornecedor_service } from "../../services/fornecedor_service/edit_fornecedor.service.js";
 import list_fornecedor_service from "../../services/fornecedor_service/list_fornecedo.service.js";
 
@@ -12,5 +13,9 @@ async function list_fornecedor(req, res) {
 async function edit_fornecedor(req, res) {
     await edit_fornecedor_service(req,res)
 }
+async function delete_fornecedor(req, res) {
+    await delete_fornecedor_service(req, res)
+    
+}
 
-export default {create_fornecedor, list_fornecedor, edit_fornecedor}
+export default {create_fornecedor, list_fornecedor, edit_fornecedor, delete_fornecedor}
