@@ -153,7 +153,7 @@ function MovimentacaoSaida() {
                                 movimentacoes.map((movimentacao) => (
                                     <div
                                         key={movimentacao.id}
-                                        className="grid grid-cols-[110px_250px_110px_130px_230px_1fr_110px] justify-items-start gap-1 p-1 border-b border-gray-500"
+                                        className="grid grid-cols-[110px_250px_110px_130px_230px_1fr_80px] justify-items-start gap-1 p-1 border-b border-gray-500"
                                     >
                                         <div className="px-4 py-4 text-gray-200">
                                             {movimentacao.id}

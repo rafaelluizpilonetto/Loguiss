@@ -9,7 +9,7 @@ import CodigoVerificacao from './pages/codigo-verificacao';
 import RedefinirSenha from './pages/redefinir-senha';
 import Termos from './pages/termos';
 import Politicas from './pages/politicas';
-import Home from './pages/home';
+import Dashboard from './pages/dashboard';
 import Produtos from './pages/produtos';
 import UnidadesMedida from './pages/unidades-medida';
 import Categorias from './pages/categorias';
@@ -38,7 +38,7 @@ function App() {
           <Route path="/redefinir-senha" element={<RedefinirSenha />} />
           <Route path="/termos" element={<Termos />} />
           <Route path="/politicas" element={<Politicas />} />
-          <Route path="/home" element={<Home />} />
+          <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/produtos" element={<Produtos />} />
           <Route path="/unidades-medida" element={<UnidadesMedida />} />
           <Route path="/categorias" element={<Categorias />} />

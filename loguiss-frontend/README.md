@@ -5,5 +5,6 @@
      npm install react-router-dom (para redirecionamento de telas e rotas), 
      npm install,
      npm install -D eslint@9 @eslint/js typescript-eslint eslint-plugin-react eslint-plugin-react-hooks eslint-plugin-react-refresh globals (usado para baixar o ESlint no projeto)
+     npm install recharts (usado para criação de gráficos para o dashboard)
 
 
