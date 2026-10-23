@@ -27,7 +27,7 @@ function Fornecedor() {
 
 
     const [newFornecedor, setNewFornecedor] = useState({
-        cnpj: "",
+        cnpj: "", //verificar como fazer pra ser ou CPF ou CNPJ
         nome: "",
         endereco: {
             rua: "",

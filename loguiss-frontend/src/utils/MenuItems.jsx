@@ -34,8 +34,8 @@ export const menuItems = [
     label: 'Movimentações',
     icon: Shuffle,
     subMenu: [
-      { label: 'Movimentações de saída', href: '/movimentacoes-saida' },
-      { label: 'Movimentações de entrada', href: '/movimentacoes-entrada' },
+      { label: 'Movimentações de saída', href: '/movimentacao-saida' },
+      { label: 'Movimentações de entrada', href: '/movimentacao-entrada' },
     ],
   },
   {

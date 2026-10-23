@@ -15,6 +15,8 @@ import UnidadesMedida from './pages/unidades-medida';
 import Categorias from './pages/categorias';
 import Usuarios from './pages/usuarios';
 import Fornecedor from './pages/fornecedor';
+import Clientes from './pages/clientes';
+import MovimentacaoSaida from './pages/movimentacao-saida';
 
 
 function App() {
@@ -30,28 +32,19 @@ function App() {
           <Route path="/" element={<Login />} />
 
           <Route path="/login" element={<Login />} />
-
           <Route path="/esqueceu-senha" element={<EsqueceuSenha />} />
-
           <Route path="/codigo-verificacao" element={<CodigoVerificacao />} />
-
           <Route path="/redefinir-senha" element={<RedefinirSenha />} />
-
           <Route path="/termos" element={<Termos />} />
-
           <Route path="/politicas" element={<Politicas />} />
-
           <Route path="/home" element={<Home />} />
-
           <Route path="/produtos" element={<Produtos />} />
-
           <Route path="/unidades-medida" element={<UnidadesMedida />} />
-
           <Route path="/categorias" element={<Categorias />} />
-
           <Route path="/usuarios" element={<Usuarios />} />
-
           <Route path="/fornecedores" element={<Fornecedor />} />
+          <Route path="/clientes" element={<Clientes />} />
+          <Route path="/movimentacao-saida" element={<MovimentacaoSaida />} />
 
         </Routes>
 
