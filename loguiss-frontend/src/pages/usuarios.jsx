@@ -8,7 +8,7 @@ import { SideBar } from '../components/Sidebar';
 import { Button } from '../components/Button'
 import { Inputs } from '../components/Inputs';
 import { Card } from '../components/Card';
-import { ButtonEye } from '../components/ButtonEye';
+import { ButtonEye } from '../components/buttonEye';
 
 function Usuarios() {
 
@@ -206,7 +206,7 @@ function Usuarios() {
                                         ? "Atualize os dados do usuário."
                                         : "Preencha os dados do novo usuário."}
                                 </p>
-
+                            
                             </div>
 
                             <button

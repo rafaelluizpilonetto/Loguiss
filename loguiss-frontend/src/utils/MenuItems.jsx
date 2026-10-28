@@ -10,7 +10,7 @@ export const menuItems = [
   {
     label: 'Dashboard',
     icon: LayoutDashboard,
-    href: '/home',
+    href: '/dashboard',
     active: true,
   },
   {

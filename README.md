@@ -1,252 +1,42 @@
+# Loguiss
 
-Backend desenvolvido em Node.js utilizando Express, Prisma ORM e PostgreSQL.
+O Loguiss é um sistema de gerenciamento de estoque pensado para micro e pequenas empresas dos setores de comércio e indústria, especialmente negócios em fase inicial. Seu objetivo é ajudar a evitar perdas e decisões baseadas em informações incompletas, oferecendo mais visibilidade sobre os produtos e os processos da operação.
 
-## Tecnologias Utilizadas
+## Visão geral
 
-* Node.js
-* Express
-* Prisma ORM
-* PostgreSQL
-* Docker
-* JWT (JSON Web Token)
-* Nodemailer
-* Dotenv
-* CORS
+O sistema busca apoiar o acompanhamento do fluxo de produtos, desde matérias-primas e insumos até os produtos finais. A proposta inclui controle de estoque, produção e perdas, além de análises que ajudem a identificar necessidades de reposição e apoiar decisões do dia a dia.
 
----
+A visão do produto também prevê integração com sistemas de ponto de venda (PDV), para reduzir lançamentos duplicados, e recursos de inteligência artificial que possam estimar quando o estoque está perto de acabar, sugerir compras e destacar situações que mereçam atenção.
 
-## Pré-requisitos
+Gerenciar estoque de forma inadequada pode parecer secundário para empresas que estão começando, mas pode levar a desperdício, falta de produtos e dificuldades para planejar a operação. O Loguiss pretende tornar esse controle mais acessível e útil para negócios de pequeno porte.
 
-Antes de iniciar o projeto, é necessário ter instalado:
+## Arquitetura geral
 
-* Node.js
-* Docker Desktop
-* Git
+O projeto está dividido em dois módulos:
 
----
+- **Frontend:** aplicação web em React, responsável pelas telas, formulários e experiência de uso.
+- **Backend:** API HTTP em Node.js e Express, responsável pelas operações de negócio e pela comunicação com o banco PostgreSQL usando Prisma.
 
-## Clonando o Projeto
-
-```bash
-git clone <url-do-repositorio>
-cd loguiss-backend
-```
-
----
-
-## Instalando Dependências
-
-```bash
-npm install
-```
-
----
-
-## Configuração das Variáveis de Ambiente
-
-Crie um arquivo `.env` na raiz do projeto.
-
-Exemplo:
-
-```env
-DATABASE_URL=postgresql://postgres:SUA_SENHA@localhost:5433/Loguiss?schema=public
-
-JWT_SECRET=sua_chave_jwt_super_secreta
-
-EMAIL_USER=seuemail@gmail.com
-EMAIL_PASS=sua_senha_de_app_google
-```
-
----
-
-## Iniciando o Banco de Dados
-
-O projeto utiliza PostgreSQL em um container Docker.
-
-Inicie o banco com:
-
-```bash
-docker compose up -d
-```
-
-ou
-
-```bash
-docker-compose up -d
-```
-
-Verifique se o container está em execução:
-
-```bash
-docker ps
-```
-
----
-
-## Executando as Migrations
-
-Após iniciar o banco:
-
-```bash
-npx prisma migrate deploy
-```
-
-Durante o desenvolvimento:
-
-```bash
-npx prisma migrate dev
-```
-
----
-
-## Gerando o Prisma Client
-
-Sempre que houver alteração no arquivo `schema.prisma`:
-
-```bash
-npx prisma generate
-```
-
----
-
-## Abrindo o Prisma Studio
-
-Interface gráfica para visualizar e editar dados:
-
-```bash
-npx prisma studio
-```
-
----
-
-## Iniciando a API
-
-```bash
-node index.js
-```
-
-ou
-
-```bash
-npm start
-```
-
----
-
-## Sistema de Autenticação
-
-O projeto utiliza:
-
-* JWT para autenticação.
-* Middleware de validação de token.
-* Recuperação de senha por e-mail.
-
-Fluxo:
-
-1. Usuário solicita recuperação de senha.
-2. Sistema gera código de verificação.
-3. Código é enviado por e-mail.
-4. Usuário valida o código.
-5. Sistema permite redefinir a senha.
-
----
-
-## Envio de E-mails
-
-O envio de e-mails é realizado através do Nodemailer utilizando Gmail.
-
-Necessário:
-
-1. Ativar verificação em duas etapas na conta Google.
-2. Gerar uma senha de aplicativo.
-3. Configurar as variáveis:
-
-```env
-EMAIL_USER=seuemail@gmail.com
-EMAIL_PASS=sua_senha_de_app
-```
-
----
-
-## Estrutura do Projeto
+O frontend envia requisições HTTP para a API. O backend processa as requisições, consulta ou altera os dados no PostgreSQL e devolve respostas para a interface.
 
 ```text
-loguiss-backend/
-│
-├── controllers/
-├── routes/
-├── prisma/
-│   ├── schema.prisma
-│   └── migrations/
-│
-├── .env
-├── docker-compose.yml
-├── prisma.config.ts
-├── database.js
-├── index.js
-└── package.json
+Pessoa usuária
+      │
+      ▼
+Frontend web (React + Vite)
+      │  Requisições HTTP/JSON
+      ▼
+API (Node.js + Express)
+      │  Prisma
+      ▼
+Banco de dados (PostgreSQL)
+
+API ── serviço de e-mail ──► envio de códigos de verificação
 ```
 
----
+A interface usa `VITE_BACK_URL` para definir a URL base da API. No desenvolvimento local, o valor padrão documentado é `http://localhost:3000`. O backend também possui integração com serviço de e-mail para o fluxo de verificação de conta/recuperação de senha.
 
-## Dependências Principais
+## Módulos e documentação
 
-```bash
-npm install express
-npm install prisma
-npm install @prisma/client
-npm install nodemailer
-npm install dotenv
-npm install cors
-npm install jsonwebtoken
-npm install cpf-cnpj-validator
-```
-
----
-
-## Comandos Úteis
-
-Gerar Prisma Client:
-
-```bash
-npx prisma generate
-```
-
-Criar migration:
-
-```bash
-npx prisma migrate dev --name nome_da_migration
-```
-
-Abrir Prisma Studio:
-
-```bash
-npx prisma studio
-```
-
-Subir containers Docker:
-
-```bash
-docker compose up -d
-```
-
-Parar containers Docker:
-
-```bash
-docker compose down
-```
-
-Ver containers ativos:
-
-```bash
-docker ps
-```
-
----
-
-## Observações
-
-* Nunca envie o arquivo `.env` para o GitHub.
-* Certifique-se de que o Docker esteja em execução antes de iniciar a API.
-* Sempre execute as migrations após clonar o projeto em uma nova máquina.
-* Após alterações no schema do Prisma, execute `npx prisma generate`.
+- [Frontend — interface web](./loguiss-frontend/README.md): tecnologias, configuração local e organização das telas.
+- [Backend — API](./loguiss-backend/README.md): arquitetura, rotas, variáveis de ambiente, banco de dados e migrations.
