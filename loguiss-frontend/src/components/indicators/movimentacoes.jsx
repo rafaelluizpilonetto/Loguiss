@@ -56,13 +56,11 @@ export function Movimentacoes() {
                 <h2 className="text-xl font-bold">
                     Movimentações
                 </h2>
-
                 <p className="mr-4 text-sm text-gray-400">
                     <span className="text-[#4EDB4E]">Entradas</span>
                     {` e `}
                     <span className="text-[#ef4444]">Saídas</span>
                 </p>
-
                 <div className="relative">
                     <Button
                         type="button"
@@ -83,7 +81,6 @@ export function Movimentacoes() {
                             <ChevronDown className="ml-2" size={20} />
                         </span>
                     </Button>
-
                     {menuAberto && (
                         <ul
                             className="absolute right-0 z-10 mt-2 min-w-full overflow-hidden rounded-lg border border-gray-700 bg-[#0d0920] py-1 shadow-lg"
@@ -112,17 +109,14 @@ export function Movimentacoes() {
                     )}
                 </div>
             </div>
-
             <ResponsiveContainer width="100%" height="90%">
                 <BarChart data={dadosFiltrados}>
                     <CartesianGrid
                         strokeDasharray="3 3"
                         stroke="#2a2638"
                     />
-
                     <XAxis dataKey="mes" stroke="#9ca3af" />
                     <YAxis stroke="#9ca3af" />
-
                     <Tooltip
                         contentStyle={{
                             backgroundColor: '#15102b',
@@ -139,14 +133,12 @@ export function Movimentacoes() {
                             fillOpacity: 0.05
                         }}
                     />
-
                     <Bar
                         dataKey="entradas"
                         name="Entradas"
                         fill="#22c55e"
                         radius={[4, 4, 0, 0]}
                     />
-
                     <Bar
                         dataKey="saidas"
                         name="Saídas"

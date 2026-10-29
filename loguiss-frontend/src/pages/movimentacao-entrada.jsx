@@ -85,25 +85,17 @@ function MovimentacaoEntrada() {
 
     return (
         <div className="min-h-screen bg-[#050212] text-white">
-
             <SideBar />
-
             <main className="ml-72 min-h-screen p-5">
-
                 <div className="mb-3 flex items-center justify-between">
-
                     <div>
-
                         <h1 className="mt-2 mb-2 text-3xl font-bold">
                             Movimentações de entrada
                         </h1>
-
                         <p className="text-gray-400">
                             Gerencie as movimentações de entrada realizadas no sistema.
                         </p>
-
                     </div>
-
                     <Button
                         type="button"
                         className="mt-2 w-auto bg-[#4EDB4E] p-3 hover:bg-[#3CB43C]"
@@ -111,42 +103,30 @@ function MovimentacaoEntrada() {
                     >
                         Adicionar movimentação
                     </Button>
-
                 </div>
-
                 <div className="mt-5 overflow-hidden rounded-lg border-2 border-gray-500">
-
                     <div className="grid grid-cols-[110px_225px_110px_130px_230px_1fr] justify-items-start gap-1 border-b border-gray-500 bg-[#15102b] p-1">
-
                         <div className="px-4 py-2">
                             Id
                         </div>
-
                         <div className="px-4 py-2">
                             Produto
                         </div>
-
                         <div className="px-4 py-2">
                             Qtd.
                         </div>
-
                         <div className="px-4 py-2">
                             Valor
                         </div>
-
                         <div className="px-4 py-2">
                             Data da movimentação
                         </div>
-
                         <div className="px-4 py-2">
                             Fornecedor
                         </div>
-
                     </div>
-
                     {/* Movimentações */}
                     <div className="flex flex-col gap-2 bg-[#08031a]">
-
                         {movimentacoes.length === 0 ? (
                             <div className="px-4 py-8 text-center text-gray-400">
                                 Nenhuma movimentação encontrada.
@@ -157,33 +137,26 @@ function MovimentacaoEntrada() {
                                     key={movimentacao.id}
                                     className="grid grid-cols-[110px_225px_110px_130px_230px_1fr_80px] justify-items-start gap-1 p-1"
                                 >
-
                                     <div className="px-4 py-4 text-gray-200">
                                         {movimentacao.id}
                                     </div>
-
                                     <div className="w-full min-w-0 truncate px-4 py-4 text-gray-200">
                                         {movimentacao.produto.desc}
                                     </div>
-
                                     <div className="px-4 py-4">
                                         <span className="rounded-lg bg-[#21183d] px-3 py-1 text-gray-200">
                                             {movimentacao.produto.quantidade}
                                         </span>
                                     </div>
-
                                     <div className="px-4 py-4 text-green-500">
                                         R$ {Number(movimentacao.produto.valor).toFixed(2)}
                                     </div>
-
                                     <div className="px-4 py-4 text-gray-200">
                                         {movimentacao.dt_movimentacao}
                                     </div>
-
                                     <div className="w-full min-w-0 truncate px-4 py-4 text-gray-200">
                                         {movimentacao.fornecedor.desc}
                                     </div>
-
                                     <div className="w-full min-w-0 px-4 py-4 text-gray-200">
                                         <ButtonEye
                                             isOpen={showMovimentacaoForm && newMovimentacao?.id === movimentacao.id}
@@ -191,39 +164,26 @@ function MovimentacaoEntrada() {
                                             title="Visualizar movimentação"
                                         />
                                     </div>
-
                                 </div>
                             ))
                         )}
-
                     </div>
-
                 </div>
-
             </main>
-
             {showMovimentacaoForm && (
-
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4 backdrop-blur-sm">
-
                     <div className="w-full max-w-2xl rounded-lg bg-[#050210] p-6 shadow-2xl">
-
                         <div className="mb-6 flex items-center justify-between">
-
                             <div>
-
                                 <h2 className="text-2xl font-bold">
                                     {visualizarMovimentacao ? "Visualizar movimentação" : "Adicionar movimentação"}
                                 </h2>
-
                                 <p className="mt-1 text-sm text-gray-400">
                                     {visualizarMovimentacao
                                         ? "Visualize os dados da movimentação."
                                         : "Preencha os dados da movimentação."}
                                 </p>
-                            
                             </div>
-
                             <button
                                 type="button"
                                 onClick={fecharFormulario}
@@ -231,21 +191,14 @@ function MovimentacaoEntrada() {
                             >
                                 ×
                             </button>
-
                         </div>
-
                         <form onSubmit={salvarMovimentacao}>
-
                             <fieldset disabled={visualizarMovimentacao}>
-
                                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-
                                     <div>
-
                                         <label className="mb-1 block text-sm font-medium">
                                             Data da movimentação
                                         </label>
-
                                         <input
                                             type="date"
                                             disabled={visualizarMovimentacao}
@@ -259,15 +212,11 @@ function MovimentacaoEntrada() {
                                             className="w-full rounded-lg border border-gray-700 bg-[#15102b] p-3 text-white outline-none focus:border-[#4EDB4E] disabled:cursor-not-allowed disabled:opacity-70"
                                             required
                                         />
-
                                     </div>
-
                                     <div>
-
                                         <label className="mb-1 block text-sm font-medium">
                                             Fornecedor
                                         </label>
-
                                         <Inputs
                                             type="text"
                                             disabled={visualizarMovimentacao}
@@ -279,15 +228,11 @@ function MovimentacaoEntrada() {
                                             className="w-full rounded-lg border border-gray-700 bg-[#15102b] p-3 text-white outline-none focus:border-[#4EDB4E] disabled:cursor-not-allowed disabled:opacity-70"
                                             required
                                         />
-
                                     </div>
-
                                     <div>
-
                                         <label className="mb-1 block text-sm font-medium">
                                             Produto
                                         </label>
-
                                         <Inputs
                                             type="text"
                                             disabled={visualizarMovimentacao}
@@ -299,15 +244,11 @@ function MovimentacaoEntrada() {
                                             className="w-full rounded-lg border border-gray-700 bg-[#15102b] p-3 focus:border-[#4EDB4E] disabled:cursor-not-allowed disabled:opacity-70"
                                             required
                                         />
-
                                     </div>
-
                                     <div>
-
                                         <label className="mb-1 block text-sm font-medium">
                                             Prazo de chegada
                                         </label>
-
                                         <Inputs
                                             type="date"
                                             disabled={visualizarMovimentacao}
@@ -318,15 +259,11 @@ function MovimentacaoEntrada() {
                                             className="w-full rounded-lg border border-gray-700 bg-[#15102b] p-3 focus:border-[#4EDB4E] disabled:cursor-not-allowed disabled:opacity-70"
                                             required
                                         />
-
                                     </div>
-
                                     <div>
-
                                         <label className="mb-1 block text-sm font-medium">
                                             Quantidade
                                         </label>
-
                                         <Inputs
                                             type="number"
                                             min="1"
@@ -339,15 +276,11 @@ function MovimentacaoEntrada() {
                                             className="w-full rounded-lg border border-gray-700 bg-[#15102b] p-3 focus:border-[#4EDB4E] disabled:cursor-not-allowed disabled:opacity-70"
                                             required
                                         />
-
                                     </div>
-
                                     <div>
-
                                         <label className="mb-1 block text-sm font-medium">
                                             Valor
                                         </label>
-
                                         <Inputs
                                             type="number"
                                             min="0"
@@ -361,15 +294,11 @@ function MovimentacaoEntrada() {
                                             className="w-full rounded-lg border border-gray-700 bg-[#15102b] p-3 focus:border-[#4EDB4E] disabled:cursor-not-allowed disabled:opacity-70"
                                             required
                                         />
-
                                     </div>
-
                                     <div>
-
                                         <label className="mb-1 block text-sm font-medium">
                                             CPF/CNPJ do fornecedor
                                         </label>
-
                                         <Inputs
                                             type="text"
                                             disabled={visualizarMovimentacao}
@@ -384,15 +313,10 @@ function MovimentacaoEntrada() {
                                             className="w-full rounded-lg border border-gray-700 bg-[#15102b] p-3 focus:border-[#4EDB4E] disabled:cursor-not-allowed disabled:opacity-70"
                                             required
                                         />
-
                                     </div>
-
                                 </div>
-
                             </fieldset>
-
                             <div className="mt-6 flex justify-end gap-3">
-
                                 <button
                                     type="button"
                                     onClick={fecharFormulario}
@@ -400,7 +324,6 @@ function MovimentacaoEntrada() {
                                 >
                                     {visualizarMovimentacao ? "Fechar" : "Cancelar"}
                                 </button>
-
                                 {!visualizarMovimentacao && (
                                     <Button
                                         type="submit"
@@ -409,17 +332,11 @@ function MovimentacaoEntrada() {
                                         Cadastrar movimentação
                                     </Button>
                                 )}
-
                             </div>
-
                         </form>
-
                     </div>
-
                 </div>
-
             )}
-
         </div>
     );
 }

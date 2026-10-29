@@ -80,24 +80,17 @@ function Clientes() {
     return (
 
         <div className="min-h-screen bg-[#050212] text-white">
-
             <SideBar />
-
             <main className="ml-72 min-h-screen p-5">
-
                 <div className="flex items-center justify-between mb-3">
-
                     <div>
                         <h1 className="text-3xl font-bold mb-2 mt-2">
                             Clientes
                         </h1>
-
                         <p className="text-gray-400">
                             Esta é a página de clientes. Aqui você pode gerenciar os clientes cadastrados no sistema.
                         </p>
-
                     </div>
-
                     <Button
                         type="button"
                         className="bg-[#4EDB4E] hover:bg-[#3CB43C] p-3 w-auto mt-2"
@@ -121,11 +114,8 @@ function Clientes() {
                     >
                         Adicionar novo cliente
                     </Button>
-
                 </div>
-
                 <div className="flex items-center justify-between">
-
                     <Inputs
                         type="text"
                         placeholder="Pesquisar..."
@@ -140,9 +130,7 @@ function Clientes() {
                         className="mt-5 w-1/2 rounded-lg border bg-[#15102b] p-3 focus:border-[#4EDB4E]"
                         icon={Search}
                     />
-
                 </div>
-
                 <div className="mt-8 grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
                     {filteredClientes.map(({ cliente, index }) => (
                         <Card
@@ -161,47 +149,33 @@ function Clientes() {
                                 }
                             }}
                         >
-
                             <p className="mt-1 text-gray-400">
                                 Email: {cliente.email}
                             </p>
-
                             <p className="mt-1 text-gray-400">
                                 Telefone: {cliente.telefone}
                             </p>
-
                             <p className="mt-1 text-gray-400">
                                 CPF | CNPJ: {cliente.cpf}
                             </p>
-
                         </Card>
                     ))}
-
                 </div>
-
             </main>
-
             {showClientesForm && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm p-4">
-
                     <div className="w-full max-w-2xl rounded-lg bg-[#050210] p-6 shadow-2xl">
-
                         <div className="mb-6 flex items-center justify-between">
-
                             <div>
-
                                 <h2 className="text-2xl font-bold">
                                     {editingIndex !== null ? "Editar cliente" : "Adicionar cliente"}
                                 </h2>
-
                                 <p className="mt-1 text-sm text-gray-400">
                                     {editingIndex !== null
                                         ? "Atualize os dados do cliente."
                                         : "Preencha os dados do novo cliente."}
                                 </p>
-
                             </div>
-
                             <button
                                 type="button"
                                 onClick={() => setShowClientesForm(false)}
@@ -209,13 +183,10 @@ function Clientes() {
                             >
                                 ×
                             </button>
-
                         </div>
-
                         <form
                             onSubmit={(e) => {
                                 e.preventDefault();
-
                                 if (editingIndex !== null) {
                                     editCliente(editingIndex, newCliente);
                                     toast.success("Cliente atualizado com sucesso!");
@@ -223,20 +194,15 @@ function Clientes() {
                                     addNewCliente();
                                     toast.success("Cliente cadastrado com sucesso!");
                                 }
-
                                 setEditingIndex(null);
                                 setShowClientesForm(false);
                             }}
                         >
-
-
                             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-
                                 <div className="sm:col-span-2">
                                     <label className="mb-1 block text-sm font-medium">
                                         Nome do cliente
                                     </label>
-
                                     <Inputs
                                         type="text"
                                         value={newCliente.desc}
@@ -251,12 +217,10 @@ function Clientes() {
                                         required
                                     />
                                 </div>
-
                                 <div>
                                     <label className="mb-1 block text-sm font-medium">
                                         Email
                                     </label>
-
                                     <Inputs
                                         type="email"
                                         value={newCliente.email}
@@ -271,12 +235,10 @@ function Clientes() {
                                         required
                                     />
                                 </div>
-
                                 <div>
                                     <label className="mb-1 block text-sm font-medium">
                                         Telefone
                                     </label>
-
                                     <Inputs
                                         type="text"
                                         value={newCliente.telefone}
@@ -286,12 +248,10 @@ function Clientes() {
                                         required
                                     />
                                 </div>
-
                                 <div>
                                     <label className="mb-1 block text-sm font-medium">
                                         CPF | CNPJ
                                     </label>
-
                                     <Inputs
                                         type="text"
                                         value={newCliente.cpf}
@@ -301,11 +261,8 @@ function Clientes() {
                                         required
                                     />
                                 </div>
-
                             </div>
-
                             <div className="mt-6 flex justify-end gap-3">
-
                                 <button
                                     type="button"
                                     onClick={() => setShowClientesForm(false)}
@@ -313,23 +270,17 @@ function Clientes() {
                                 >
                                     Cancelar
                                 </button>
-
                                 <Button
                                     type="submit"
                                     className="mt-0 w-auto bg-[#4EDB4E] px-5 py-3 hover:bg-[#3CB43C]"
                                 >
                                     {editingIndex !== null ? "Salvar alterações" : "Cadastrar Cliente"}
                                 </Button>
-
                             </div>
-
                         </form>
-
                     </div>
-
                 </div>
             )}
-
         </div>
 
     )

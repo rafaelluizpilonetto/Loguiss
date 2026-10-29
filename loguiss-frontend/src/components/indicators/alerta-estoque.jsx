@@ -8,7 +8,6 @@ export function AlertaEstoque({ produtos }) {
             <h2 className="mb-4 text-xl font-bold">
                 Alertas de estoque
             </h2>
-
             {produtosComEstoqueBaixo.length === 0 ? (
                 <p className="text-sm text-gray-400">
                     Nenhum produto com estoque baixo.
@@ -24,12 +23,10 @@ export function AlertaEstoque({ produtos }) {
                                 <p className="truncate font-medium">
                                     {produto.nome}
                                 </p>
-
                                 <p className="text-sm text-gray-400">
                                     Estoque atual: {produto.estoqueAtual} unidades
                                 </p>
                             </div>
-
                             <span className="shrink-0 rounded-md bg-red-500/10 px-3 py-1 text-sm text-red-400">
                                 Estoque baixo
                             </span>

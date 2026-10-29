@@ -19,19 +19,13 @@ import Clientes from './pages/clientes';
 import MovimentacaoSaida from './pages/movimentacao-saida';
 import MovimentacaoEntrada from './pages/movimentacao-entrada';
 
-
 function App() {
   return (
     <>
-
       <Toaster position="top-right" />
-
       <BrowserRouter>
-
         <Routes>
-
           <Route path="/" element={<Login />} />
-
           <Route path="/login" element={<Login />} />
           <Route path="/esqueceu-senha" element={<EsqueceuSenha />} />
           <Route path="/codigo-verificacao" element={<CodigoVerificacao />} />
@@ -47,11 +41,8 @@ function App() {
           <Route path="/clientes" element={<Clientes />} />
           <Route path="/movimentacao-saida" element={<MovimentacaoSaida />} />
           <Route path="/movimentacao-entrada" element={<MovimentacaoEntrada />} />
-
         </Routes>
-
       </BrowserRouter>
-
     </>
 
   );

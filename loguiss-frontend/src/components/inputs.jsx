@@ -23,7 +23,6 @@ export function Inputs({
                 } ${className}`}
             >
                 {Icon && <Icon size={20} className="text-gray-400" />}
-
                 {type === "select" ? (
                     <select
                         className="w-full outline-none bg-[#15102b] focus:border-[#4EDB4E] text-white"
@@ -52,10 +51,8 @@ export function Inputs({
                         aria-invalid={mostrarErro}
                     />
                 )}
-
                 {rightElement}
             </div>
-
             {mostrarErro && (
                 <p className="text-red-500 text-sm mb-3">
                     {error}

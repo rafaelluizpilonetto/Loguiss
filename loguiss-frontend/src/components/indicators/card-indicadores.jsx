@@ -21,7 +21,6 @@ export function CardsIndicadores({ produtos }) {
                     </p>
                 </div>
             </Card>
-
             <Card
                 desc="Valor total do estoque"
                 icon={<DollarSign size={24} className="text-green-500" />}
