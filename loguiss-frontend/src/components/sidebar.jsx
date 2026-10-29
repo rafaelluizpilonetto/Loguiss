@@ -33,7 +33,6 @@ function MenuItem({ item, nested = false }) {
                     <span>{item.label}</span>
                 </NavLink>
             )}
-
             {hasSubmenu && (
                 <div
                     className={`absolute left-full top-0 z-50 hidden w-56 rounded-lg border border-white/10 bg-[#050212] p-2 shadow-xl shadow-black/30 ${hoverClass}`}
@@ -62,7 +61,6 @@ export function SideBar({ menuItems = menuList }) {
                 />
                 <span className="text-xl font-bold text-white">Loguiss</span>
             </div>
-
             <nav className="flex flex-1 flex-col gap-2">
                 {menuItems.map((item) => (
                     <MenuItem key={item.label} item={item} />

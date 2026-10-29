@@ -65,25 +65,15 @@ function Login() {
     return (
 
         <div className="relative min-h-screen bg-[#050212] flex items-center justify-center p-6">
-
             <div>
-
                 <div className="flex h-[490px] w-full max-w-6xl rounded-lg overflow-hidden shadow-2xl">
-
                     <aside className="hidden lg:block w-1/2 h-full">
-
                         <img src="./images/imagem-estoque.png" alt="Imagem de estoque" className="w-full h-full object-cover" />
-
                     </aside>
-
                     <form onSubmit={formularioEnviado} className="w-full lg:w-1/2 h-full overflow-y-auto bg-[#100E14] p-10">
-
                         <img src="./images/logo.png" alt="Logo da Loguiss" className="w-20 h-20 mx-auto mb-4 rounded-lg" />
-
                         <h1 className="text-3xl font-bold text-green-500 text-center mb-5">Bem-vindo de volta!</h1>
-
                         <div className="flex items-center mb-4">
-
                             <Inputs
                                 type="email"
                                 placeholder="Email"
@@ -95,11 +85,8 @@ function Login() {
                                 icon={User}
                                 className="rounded-lg border focus:border-[#4EDB4E] w-full"
                             />
-
                         </div>
-
                         <div className="flex items-center mb-1">
-
                             <Inputs
                                 type={visualizar_senha ? "text" : "password"}
                                 placeholder="Senha"
@@ -117,11 +104,8 @@ function Login() {
                                     />
                                 }
                             />
-
                         </div>
-
                         <div className="flex justify-between items-center">
-
                             <Button
                                 type="button"
                                 onClick={() => navigate('/esqueceu-senha')}
@@ -129,27 +113,20 @@ function Login() {
                             >
                                 Esqueci minha senha
                             </Button>
-
                         </div>
-
                         <Button
                             type="submit"
                             className="bg-[#4EDB4E] hover:bg-[#3CB43C] w-full p-3 mt-5">
                             Entrar
                         </Button>
-
                         <p className="mt-1 text-xs text-center text-gray-500">
                             <a href="/termos" className="hover:underline  hover:text-green-500">Termos de Serviço</a>
                             {" "} e {" "}
                             <a href="/politicas" className="hover:underline  hover:text-green-500">Políticas de Privacidade</a>.
                         </p>
-
                     </form>
-
                 </div>
-
             </div>
-
         </div>
 
     )

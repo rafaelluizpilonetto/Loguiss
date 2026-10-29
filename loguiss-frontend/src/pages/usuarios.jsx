@@ -5,9 +5,9 @@ import { Search, User } from 'lucide-react';
 import { formatarCPFCNPJ, formatarTelefone } from '../utils/validacoes';
 
 import { SideBar } from '../components/Sidebar';
-import { Button } from '../components/Button'
-import { Inputs } from '../components/Inputs';
-import { Card } from '../components/Card';
+import { Button } from '../components/button'
+import { Inputs } from '../components/inputs';
+import { Card } from '../components/card';
 import { ButtonEye } from '../components/buttonEye';
 
 function Usuarios() {
@@ -87,24 +87,17 @@ function Usuarios() {
     return (
 
         <div className="min-h-screen bg-[#050212] text-white">
-
             <SideBar />
-
             <main className="ml-72 min-h-screen p-5">
-
                 <div className="flex items-center justify-between mb-3">
-
                     <div>
                         <h1 className="text-3xl font-bold mb-2 mt-2">
                             Usuários
                         </h1>
-
                         <p className="text-gray-400">
                             Esta é a página de usuários. Aqui você pode gerenciar os usuários cadastrados no sistema.
                         </p>
-
                     </div>
-
                     <Button
                         type="button"
                         className="bg-[#4EDB4E] hover:bg-[#3CB43C] p-3 w-auto mt-2"
@@ -124,11 +117,8 @@ function Usuarios() {
                     >
                         Adicionar novo usuário
                     </Button>
-
                 </div>
-
                 <div className="flex items-center justify-between">
-
                     <Inputs
                         type="text"
                         placeholder="Pesquisar..."
@@ -143,9 +133,7 @@ function Usuarios() {
                         className="mt-5 w-1/2 rounded-lg border bg-[#15102b] p-3 focus:border-[#4EDB4E]"
                         icon={Search}
                     />
-
                 </div>
-
                 <div className="mt-8 grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
                     {filteredUsuarios.map(({ usuario, index }) => (
                         <Card
@@ -164,51 +152,36 @@ function Usuarios() {
                                 }
                             }}
                         >
-
                             <p className="mt-1 text-gray-400">
                                 Email: {usuario.email}
                             </p>
-
                             <p className="mt-1 text-gray-400">
                                 Telefone: {usuario.telefone}
                             </p>
-
                             <p className="mt-1 text-gray-400">
                                 CPF: {usuario.cpf}
                             </p>
-
                             <p className="mt-1 text-gray-400">
                                 Tipo de usuário: {usuario.tipo_usuario}
                             </p>
-
                         </Card>
                     ))}
-
                 </div>
-
             </main>
-
             {showUsuariosForm && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm p-4">
-
                     <div className="w-full max-w-2xl rounded-lg bg-[#050210] p-6 shadow-2xl">
-
                         <div className="mb-6 flex items-center justify-between">
-
                             <div>
-
                                 <h2 className="text-2xl font-bold">
                                     {editingIndex !== null ? "Editar usuário" : "Adicionar usuário"}
                                 </h2>
-
                                 <p className="mt-1 text-sm text-gray-400">
                                     {editingIndex !== null
                                         ? "Atualize os dados do usuário."
                                         : "Preencha os dados do novo usuário."}
                                 </p>
-                            
                             </div>
-
                             <button
                                 type="button"
                                 onClick={() => setShowUsuariosForm(false)}
@@ -216,43 +189,34 @@ function Usuarios() {
                             >
                                 ×
                             </button>
-
                         </div>
-
                         <form
                             onSubmit={(e) => {
                                 e.preventDefault();
-
                                 const erro = validarConfirmarSenha(
-                                newUsuario.senha,
-                                newUsuario.confirm_senha
+                                    newUsuario.senha,
+                                    newUsuario.confirm_senha
                                 );
-
                                 if (erro) {
-                                toast.error(erro);
-                                return;
+                                    toast.error(erro);
+                                    return;
                                 }
-
                                 if (editingIndex !== null) {
-                                editUsuario(editingIndex, newUsuario);
-                                toast.success("Usuário atualizado com sucesso!");
+                                    editUsuario(editingIndex, newUsuario);
+                                    toast.success("Usuário atualizado com sucesso!");
                                 } else {
-                                addNewUsuario();
-                                toast.success("Usuário cadastrado com sucesso!");
+                                    addNewUsuario();
+                                    toast.success("Usuário cadastrado com sucesso!");
                                 }
-
                                 setEditingIndex(null);
                                 setShowUsuariosForm(false);
                             }}
                         >
-
                             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-
                                 <div className="sm:col-span-2">
                                     <label className="mb-1 block text-sm font-medium">
                                         Nome do usuário
                                     </label>
-
                                     <Inputs
                                         type="text"
                                         value={newUsuario.desc}
@@ -267,12 +231,10 @@ function Usuarios() {
                                         required
                                     />
                                 </div>
-
                                 <div>
                                     <label className="mb-1 block text-sm font-medium">
                                         Email
                                     </label>
-
                                     <Inputs
                                         type="email"
                                         value={newUsuario.email}
@@ -287,13 +249,10 @@ function Usuarios() {
                                         required
                                     />
                                 </div>
-
                                 <div>
                                     <label className="mb-1 block text-sm font-medium">
                                         Senha
                                     </label>
-
-
                                     <Inputs
                                         type={visualizar_senha ? 'text' : 'password'}
                                         placeholder="Senha"
@@ -305,12 +264,10 @@ function Usuarios() {
                                         required
                                     />
                                 </div>
-
                                 <div>
                                     <label className="mb-1 block text-sm font-medium">
                                         Confirmar senha
                                     </label>
-
                                     <Inputs
                                         type={visualizar_confirmar_senha ? 'text' : 'password'}
                                         placeholder="Confirmar senha"
@@ -326,12 +283,10 @@ function Usuarios() {
                                         required
                                     />
                                 </div>
-
                                 <div>
                                     <label className="mb-1 block text-sm font-medium">
                                         Telefone
                                     </label>
-
                                     <Inputs
                                         type="text"
                                         value={newUsuario.telefone}
@@ -341,12 +296,10 @@ function Usuarios() {
                                         required
                                     />
                                 </div>
-
                                 <div>
                                     <label className="mb-1 block text-sm font-medium">
                                         CPF
                                     </label>
-
                                     <Inputs
                                         type="text"
                                         value={newUsuario.cpf}
@@ -356,12 +309,10 @@ function Usuarios() {
                                         required
                                     />
                                 </div>
-
                                 <div>
                                     <label className="mb-1 block text-sm font-medium">
                                         Tipo de usuário
                                     </label>
-
                                     <Inputs
                                         type="select"
                                         value={newUsuario.tipo_usuario}
@@ -380,11 +331,8 @@ function Usuarios() {
                                         required
                                     />
                                 </div>
-
                             </div>
-
                             <div className="mt-6 flex justify-end gap-3">
-
                                 <button
                                     type="button"
                                     onClick={() => setShowUsuariosForm(false)}
@@ -392,23 +340,17 @@ function Usuarios() {
                                 >
                                     Cancelar
                                 </button>
-
                                 <Button
                                     type="submit"
                                     className="mt-0 w-auto bg-[#4EDB4E] px-5 py-3 hover:bg-[#3CB43C]"
                                 >
                                     {editingIndex !== null ? "Salvar alterações" : "Cadastrar Usuário"}
                                 </Button>
-
                             </div>
-
                         </form>
-
                     </div>
-
                 </div>
             )}
-
         </div>
 
     )

@@ -92,27 +92,17 @@ function CodigoVerificacao() {
     return (
 
         <div className="bg-[#050212] h-screen w-screen flex items-center justify-center ">
-
             <div className="flex flex-col gap-5">
-
                 <div className="flex w-full max-w-6xl rounded-lg overflow-hidden shadow-2xl">
-
                     <aside className="hidden lg:flex w-1/2 bg-[#0D0B12] items-center justify-center">
-
                         <img src="./images/imagem-estoque.png" alt="Imagem de estoque" className="w-full h-full" />
-
                     </aside>
-
                     <form onSubmit={formularioEnviado} className="bg-[#100E14] p-10 rounded-lg w-[400px] shadow-lg">
-
                         <img src="./images/logo.png" alt="Logo da Loguiss" className="w-20 h-20 mx-auto mb-4 rounded-lg" />
-
                         <p className="text-center text-green-500 mb-5">
                             Informe o código de verificação enviado para o seu email para redefinir sua senha.
                         </p>
-
                         <div className="flex justify-center gap-3 bg-gray rounded-lg p-3 border border-gray-500 mb-4">
-
                             <input
                                 type="text"
                                 inputMode="numeric"
@@ -124,7 +114,6 @@ function CodigoVerificacao() {
                                 ref={(el) => (inputRefs.current[0] = el)}
                                 autoComplete="off"
                             />
-
                             <input
                                 type="text"
                                 inputMode="numeric"
@@ -136,7 +125,6 @@ function CodigoVerificacao() {
                                 ref={(el) => (inputRefs.current[1] = el)}
                                 autoComplete="off"
                             />
-
                             <input
                                 type="text"
                                 inputMode="numeric"
@@ -148,7 +136,6 @@ function CodigoVerificacao() {
                                 ref={(el) => (inputRefs.current[2] = el)}
                                 autoComplete="off"
                             />
-
                             <input
                                 type="text"
                                 inputMode="numeric"
@@ -160,7 +147,6 @@ function CodigoVerificacao() {
                                 ref={(el) => (inputRefs.current[3] = el)}
                                 autoComplete="off"
                             />
-
                             <input
                                 type="text"
                                 inputMode="numeric"
@@ -172,7 +158,6 @@ function CodigoVerificacao() {
                                 ref={(el) => (inputRefs.current[4] = el)}
                                 autoComplete="off"
                             />
-
                             <input
                                 type="text"
                                 inputMode="numeric"
@@ -184,21 +169,17 @@ function CodigoVerificacao() {
                                 ref={(el) => (inputRefs.current[5] = el)}
                                 autoComplete="off"
                             />
-
                         </div>
-
                         {mostrarErro && validarCodigo(codigo.join('')) && (
                             <p className="text-red-500 text-sm mb-3">
                                 {validarCodigo(codigo.join(''))}
                             </p>
                         )}
-
                         <Button
                             type="submit"
                             className="w-full p-3 mb-5 bg-[#4EDB4E] hover:bg-[#3CB43C]">
                             Verificar código
                         </Button>
-
                         <Button
                             type="button"
                             className="w-full p-3 bg-[#0B0819] hover:bg-[#170F3C]"
@@ -206,13 +187,9 @@ function CodigoVerificacao() {
                         >
                             Voltar para o login
                         </Button>
-
                     </form>
-
                 </div>
-
             </div>
-
         </div>
     )
 }
