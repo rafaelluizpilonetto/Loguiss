@@ -17,6 +17,7 @@ import Usuarios from './pages/usuarios';
 import Fornecedor from './pages/fornecedor';
 import Clientes from './pages/clientes';
 import MovimentacaoSaida from './pages/movimentacao-saida';
+import MovimentacaoEntrada from './pages/movimentacao-entrada';
 
 
 function App() {
@@ -45,6 +46,7 @@ function App() {
           <Route path="/fornecedores" element={<Fornecedor />} />
           <Route path="/clientes" element={<Clientes />} />
           <Route path="/movimentacao-saida" element={<MovimentacaoSaida />} />
+          <Route path="/movimentacao-entrada" element={<MovimentacaoEntrada />} />
 
         </Routes>
 

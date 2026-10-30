@@ -8,6 +8,7 @@ import router_fornecedor from './routes/routes_fornecedor.js';
 import router_unidade_medida from './routes/routes_unidade_medida.js';
 import router_cliente from './routes/routes_clientes.js';
 import router_user from './routes/routes_user.js';
+import router_movimentacao from './routes/routes_movimentacao.js';
 
 const app = express();
 
@@ -20,7 +21,8 @@ app.use("/produto", router_produto);
 app.use("/fornecedor", router_fornecedor);
 app.use("/unidade_medida", router_unidade_medida);
 app.use("/cliente", router_cliente);
-app.use("/user", router_user)
+app.use("/user", router_user);
+app.use("/movi", router_movimentacao)
 
 
 app.listen(3000);

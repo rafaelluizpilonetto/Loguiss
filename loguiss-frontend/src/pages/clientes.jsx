@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 
 import { Search, User } from 'lucide-react';
+import api from '../services/api'
 import { formatarCPFCNPJ, formatarTelefone } from '../utils/validacoes';
 
 import { SideBar } from '../components/Sidebar';
@@ -16,15 +17,14 @@ function Clientes() {
     const [searchTerm, setSearchTerm] = useState("");
     const [appliedSearch, setAppliedSearch] = useState("");
     const [editingIndex, setEditingIndex] = useState(null);
-    const filteredClientes = clientes
-        .map((cliente, index) => ({ cliente, index }))
+    const filteredClientes = (clientes ?? []).map((cliente, index) => ({ cliente, index }))
         .filter(({ cliente }) => {
-            const texto = (cliente.desc ?? cliente.descricao ?? cliente.nome ?? "").toLowerCase();
+            const texto = (cliente.nome ?? "").toLowerCase();
             return texto.includes(appliedSearch.toLowerCase());
         });
 
     const [newCliente, setNewCliente] = useState({
-        desc: "",
+        nome: "",
         email: "",
         telefone: "",
         cpf: "",
@@ -36,6 +36,14 @@ function Clientes() {
             estado: ""
         },
     });
+    const cliente_api = async () =>{
+        const clientes_api = await api.get('/cliente/list_clientes')
+        console.log(clientes_api.data.Clientes)
+        setClientes(clientes_api.data.Clientes)
+    }
+    useEffect(() => {
+        cliente_api()
+    }, [])
 
     const addNewCliente = () => {
 
@@ -47,7 +55,7 @@ function Clientes() {
         setShowClientesForm(false);
 
         setNewCliente({
-            desc: "",
+            nome: "",
             email: "",
             telefone: "",
             cpf: "", //verificar como fazer pra ser ou CPF ou CNPJ
@@ -104,7 +112,7 @@ function Clientes() {
                         onClick={() => {
                             setEditingIndex(null);
                             setNewCliente({
-                                desc: "",
+                                nome: "",
                                 email: "",
                                 telefone: "",
                                 cpf: "",
@@ -147,7 +155,7 @@ function Clientes() {
                     {filteredClientes.map(({ cliente, index }) => (
                         <Card
                             key={index}
-                            desc={cliente.desc}
+                            desc={cliente.nome}
                             icon={<User className="h-6 w-6 mt-2 text-gray-400" />}
                             onEdit={() => {
                                 setEditingIndex(index);
@@ -239,11 +247,11 @@ function Clientes() {
 
                                     <Inputs
                                         type="text"
-                                        value={newCliente.desc}
+                                        value={newCliente.nome}
                                         onChange={(e) =>
                                             setNewCliente({
                                                 ...newCliente,
-                                                desc: e.target.value
+                                                nome: e.target.value
                                             })
                                         }
                                         placeholder="Nome do cliente"

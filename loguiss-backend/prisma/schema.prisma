@@ -126,14 +126,19 @@ model receita_produto {
 model movimentacao_estoque {
   id_movimentacao Int      @id @default(autoincrement())
   id_produto      Int
+  id_cliente      Int?
   tipo            String
   quantidade      Decimal
+  valor_unitario  Decimal  @default(0) @db.Decimal(10, 2)
+  valor_total     Decimal  @default(0) @db.Decimal(10, 2)
   saldo_final     Decimal
   data_movimento  DateTime @default(now())
   observacao      String?
+
   produto         produto  @relation(fields: [id_produto], references: [id_produto])
 
   @@index([id_produto])
+  @@index([id_cliente])
   @@index([data_movimento])
 }
 

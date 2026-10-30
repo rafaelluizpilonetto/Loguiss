@@ -1,14 +1,15 @@
-import { useState } from 'react';
+import { useState, useEffect, useEffectEvent, use } from 'react';
 import { toast } from 'sonner';
 
 import { Search, User } from 'lucide-react';
+import api from '../services/api'
 import { formatarCPFCNPJ, formatarTelefone } from '../utils/validacoes';
 
 import { SideBar } from '../components/Sidebar';
 import { Button } from '../components/Button'
 import { Inputs } from '../components/Inputs';
 import { Card } from '../components/Card';
-import { ButtonEye } from '../components/ButtonEye';
+import { ButtonEye } from '../components/buttonEye';
 
 function Usuarios() {
 
@@ -19,8 +20,7 @@ function Usuarios() {
     const [editingIndex, setEditingIndex] = useState(null);
     const [visualizar_senha, setVisualizarSenha] = useState(false);
     const [visualizar_confirmar_senha, setVisualizarConfirmarSenha] = useState(false);
-    const filteredUsuarios = usuarios
-        .map((usuario, index) => ({ usuario, index }))
+    const filteredUsuarios = (usuarios ?? []).map((usuario, index) => ({ usuario, index }))
         .filter(({ usuario }) => {
             const texto = (usuario.desc ?? usuario.descricao ?? usuario.nome ?? "").toLowerCase();
             return texto.includes(appliedSearch.toLowerCase());
@@ -35,6 +35,16 @@ function Usuarios() {
         cpf: "",
         tipo_usuario: ""
     });
+
+    const user_api = async ()=>{
+        const users = await api.get('/user/list_user')
+        setUsuarios(users.data.users)
+    }
+
+    useEffect(() =>{
+        user_api()
+    }, [])
+
 
     function validarConfirmarSenha(senha, confirmarSenha) {
         if (confirmarSenha.trim() === '') {
@@ -150,7 +160,7 @@ function Usuarios() {
                     {filteredUsuarios.map(({ usuario, index }) => (
                         <Card
                             key={index}
-                            desc={usuario.desc}
+                            desc={usuario.nome_usuario}
                             icon={<User className="h-6 w-6 mt-2 text-gray-400" />}
                             onEdit={() => {
                                 setEditingIndex(index);
@@ -206,7 +216,7 @@ function Usuarios() {
                                         ? "Atualize os dados do usuário."
                                         : "Preencha os dados do novo usuário."}
                                 </p>
-
+                            
                             </div>
 
                             <button
