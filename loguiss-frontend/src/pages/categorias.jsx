@@ -1,8 +1,10 @@
+
 import { Layers2, Search } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
 import { Button } from '../components/button';
+import { DeleteModal } from '../components/deleteModal';
 import { EntityCard } from '../components/card';
 import { Inputs } from '../components/inputs';
 import { SideBar } from '../components/sidebar';
@@ -14,6 +16,7 @@ function Categorias() {
     const [editingIndex, setEditingIndex] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [appliedSearch, setAppliedSearch] = useState('');
+    const [categoriaParaExcluir, setCategoriaParaExcluir] = useState(null);
 
     const [newCategory, setNewCategory] = useState({
         desc: '',
@@ -84,20 +87,28 @@ function Categorias() {
         });
     };
 
-    const deleteCategory = async (id) => {
+    const deleteCategory = async () => {
+        if (!categoriaParaExcluir) return;
+
         try {
-            await api.delete(`/categoria/delete_categoria/${id}`);
+            await api.delete(`/categoria/delete_categoria/${categoriaParaExcluir.id_categoria}`);
+
+            setCategories((listaAtual) =>
+                listaAtual.filter(
+                    (categoria) => categoria.id_categoria !== categoriaParaExcluir.id_categoria
+                )
+            );
 
             toast.success('Categoria excluída com sucesso!');
-            await categoria_api();
         } catch (error) {
             console.error('Erro ao excluir categoria:', error);
             toast.error('Erro ao excluir categoria!');
+            throw error;
         }
     };
 
     useEffect(() => {
-        if (!showCategoryForm) return;
+        if (!showCategoryForm && !categoriaParaExcluir) return;
 
         const overflowAnterior = document.body.style.overflow;
 
@@ -106,7 +117,7 @@ function Categorias() {
         return () => {
             document.body.style.overflow = overflowAnterior;
         };
-    }, [showCategoryForm]);
+    }, [showCategoryForm, categoriaParaExcluir]);
 
     return (
         <div className="min-h-screen bg-[var(--background)] text-[var(--text)]">
@@ -175,11 +186,7 @@ function Categorias() {
 
                                 setShowCategoryForm(true);
                             }}
-                            onDelete={() => {
-                                if (window.confirm('Deseja excluir esta categoria?')) {
-                                    deleteCategory(categoria.id_categoria);
-                                }
-                            }}
+                            onDelete={() => setCategoriaParaExcluir(categoria)}
                         />
                     ))}
                 </div>
@@ -254,6 +261,14 @@ function Categorias() {
                     </div>
                 </div>
             )}
+
+            <DeleteModal
+                isOpen={!!categoriaParaExcluir}
+                onClose={() => setCategoriaParaExcluir(null)}
+                onConfirm={deleteCategory}
+                titulo="Excluir categoria"
+                descricao={`Tem certeza de que deseja excluir a categoria ${categoriaParaExcluir?.descricao ?? categoriaParaExcluir?.desc ?? ''}?`}
+            />
         </div>
     );
 }

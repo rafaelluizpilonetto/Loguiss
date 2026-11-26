@@ -1,9 +1,11 @@
+
 import { Search, User } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
 import { Button } from '../components/button';
 import { ButtonEye } from '../components/buttonEye';
+import { DeleteModal } from '../components/deleteModal';
 import { EntityCard } from '../components/card';
 import { Inputs } from '../components/inputs';
 import { SideBar } from '../components/sidebar';
@@ -40,6 +42,7 @@ function Usuarios() {
     const [searchTerm, setSearchTerm] = useState('');
     const [appliedSearch, setAppliedSearch] = useState('');
     const [editingIndex, setEditingIndex] = useState(null);
+    const [usuarioParaExcluir, setUsuarioParaExcluir] = useState(null);
 
     const [visualizar_senha, setVisualizarSenha] = useState(false);
     const [visualizar_confirmar_senha, setVisualizarConfirmarSenha] = useState(false);
@@ -75,9 +78,9 @@ function Usuarios() {
         user_api();
     }, []);
 
-    // Bloqueia a rolagem da página enquanto o modal está aberto
+    // Bloqueia a rolagem da página enquanto algum modal está aberto
     useEffect(() => {
-        if (!showUsuariosForm) return;
+        if (!showUsuariosForm && !usuarioParaExcluir) return;
 
         const overflowAnterior = document.body.style.overflow;
         document.body.style.overflow = 'hidden';
@@ -85,7 +88,7 @@ function Usuarios() {
         return () => {
             document.body.style.overflow = overflowAnterior;
         };
-    }, [showUsuariosForm]);
+    }, [showUsuariosForm, usuarioParaExcluir]);
 
     // Limpar formulário
     const resetUsuario = () => {
@@ -187,16 +190,26 @@ function Usuarios() {
         }
     };
 
-    // Excluir usuário (confirme se a rota do backend é esta)
-    const deleteUsuario = async (id) => {
+    // Excluir usuário
+    const deleteUsuario = async () => {
+        if (!usuarioParaExcluir) return;
+
         try {
-            const response = await api.delete(`/user/delete_user/${id}`);
+            const response = await api.delete(
+                `/user/delete_user/${usuarioParaExcluir.id_user}`
+            );
+
+            setUsuarios((listaAtual) =>
+                listaAtual.filter(
+                    (usuario) => usuario.id_user !== usuarioParaExcluir.id_user
+                )
+            );
 
             toast.success(response.data?.MSG || 'Usuário excluído com sucesso!');
-            await user_api();
         } catch (error) {
             console.error(error.response?.data || error);
             toast.error(error.response?.data?.MSG || 'Erro ao excluir usuário!');
+            throw error;
         }
     };
 
@@ -270,11 +283,7 @@ function Usuarios() {
                             titulo={usuario.nome_usuario}
                             icone={User}
                             onEdit={() => abrirEdicao(usuario)}
-                            onDelete={() => {
-                                if (window.confirm('Deseja excluir este usuário?')) {
-                                    deleteUsuario(usuario.id_user);
-                                }
-                            }}
+                            onDelete={() => setUsuarioParaExcluir(usuario)}
                         >
                             <p className="mt-1 text-texto-suave">Email: {usuario.email}</p>
 
@@ -435,6 +444,14 @@ function Usuarios() {
                     </div>
                 </div>
             )}
+
+            <DeleteModal
+                isOpen={!!usuarioParaExcluir}
+                onClose={() => setUsuarioParaExcluir(null)}
+                onConfirm={deleteUsuario}
+                titulo="Excluir usuário"
+                descricao={`Tem certeza de que deseja excluir o usuário ${usuarioParaExcluir?.nome_usuario ?? ''}?`}
+            />
         </div>
     );
 }

@@ -3,10 +3,10 @@ import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 
 import { Button } from '../components/button';
+import { DeleteModal } from '../components/deleteModal';
 import { SideBar } from '../components/sidebar';
 import { Inputs } from '../components/inputs';
 import { Search, Combine } from 'lucide-react';
-import { index } from 'lodash';
 import { EntityCard } from '../components/card';
 import api from '../services/api';
 
@@ -15,6 +15,7 @@ function UnidadesMedida() {
     const [showUnitForm, setShowUnitForm] = useState(false);
     const [units, setUnits] = useState([]);
     const [editingIndex, setEditingIndex] = useState(null);
+    const [unidadeParaExcluir, setUnidadeParaExcluir] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [appliedSearch, setAppliedSearch] = useState('');
 
@@ -125,28 +126,36 @@ function UnidadesMedida() {
     }
 
     // DESATIVAR UNIDADE
-    async function deleteUnit(id) {
+    async function deleteUnit() {
+        if (!unidadeParaExcluir) return;
+
         try {
             const response = await api.delete(
-                `/unidade_medida/delete_unidade_medida/${id}`
+                `/unidade_medida/delete_unidade_medida/${unidadeParaExcluir.id_unidade}`
             );
 
             toast.success(
                 response.data.MSG || 'Unidade desativada com sucesso!'
             );
 
-            await unit_api();
+            setUnits((listaAtual) =>
+                listaAtual.filter(
+                    (unidade) => unidade.id_unidade !== unidadeParaExcluir.id_unidade
+                )
+            );
 
         } catch (error) {
             toast.error(
                 error.response?.data?.MSG ||
                 'Erro ao desativar unidade de medida!'
             );
+
+            throw error;
         }
     }
 
     useEffect(() => {
-        if (!showUnitForm) return;
+        if (!showUnitForm && !unidadeParaExcluir) return;
 
         const overflowAnterior = document.body.style.overflow;
 
@@ -155,7 +164,7 @@ function UnidadesMedida() {
         return () => {
             document.body.style.overflow = overflowAnterior;
         };
-    }, [showUnitForm]);
+    }, [showUnitForm, unidadeParaExcluir]);
 
     return (
         <div className="min-h-screen bg-[var(--background)] text-[var(--text)]">
@@ -208,12 +217,8 @@ function UnidadesMedida() {
                 />
 
                 <div className="mt-8 grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
-                    {filteredUnidades.length === 0 && (
-                        <p className="text-texto-suave">Nenhuma unidade de medida encontrada.</p>
-                    )}
-
-                    {!loading && filteredUnidades.length === 0 && (
-                        <p className="text-gray-400">
+                    {filteredUnidades.length === 0 && !loading && (
+                        <p className="text-texto-suave">
                             Nenhuma unidade de medida encontrada.
                         </p>
                     )}
@@ -235,12 +240,7 @@ function UnidadesMedida() {
 
                                 setShowUnitForm(true);
                             }}
-                            onDelete={() => {
-                                if (window.confirm('Deseja excluir esta unidade de medida?')) {
-                                    deleteUnit(unidade.id_unidade);
-                                    toast.success('Unidade de medida excluída com sucesso!');
-                                }
-                            }}
+                            onDelete={() => setUnidadeParaExcluir(unidade)}
                         >
                             <p className="mt-1 text-[var(--text-secondary)]">
                                 Gramatura: {unidade.gramatura || 'Não informada'}
@@ -365,17 +365,29 @@ function UnidadesMedida() {
 
                                 <Button
                                     type="submit"
+                                    disabled={saving}
+                                    loading={saving}
                                     className="px-5"
                                 >
-                                    {editingIndex !== null
-                                        ? 'Salvar alterações'
-                                        : 'Cadastrar unidade'}
+                                    {saving
+                                        ? 'Salvando...'
+                                        : editingIndex !== null
+                                            ? 'Salvar alterações'
+                                            : 'Cadastrar unidade'}
                                 </Button>
                             </div>
                         </form>
                     </div>
                 </div>
             )}
+
+            <DeleteModal
+                isOpen={!!unidadeParaExcluir}
+                onClose={() => setUnidadeParaExcluir(null)}
+                onConfirm={deleteUnit}
+                titulo="Excluir unidade de medida"
+                descricao={`Tem certeza de que deseja excluir a unidade ${unidadeParaExcluir?.desc}?`}
+            />
         </div>
     );
 }

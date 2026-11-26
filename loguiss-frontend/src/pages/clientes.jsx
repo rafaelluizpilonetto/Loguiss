@@ -1,8 +1,10 @@
+
 import { Search, User } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
 import { Button } from '../components/button';
+import { DeleteModal } from '../components/deleteModal';
 import { EntityCard } from '../components/card';
 import { Inputs } from '../components/inputs';
 import { SideBar } from '../components/sidebar';
@@ -15,6 +17,7 @@ function Clientes() {
     const [searchTerm, setSearchTerm] = useState('');
     const [appliedSearch, setAppliedSearch] = useState('');
     const [editingIndex, setEditingIndex] = useState(null);
+    const [clienteParaExcluir, setClienteParaExcluir] = useState(null);
 
     const [newCliente, setNewCliente] = useState({
         nome: '',
@@ -117,16 +120,23 @@ function Clientes() {
     };
 
     // Excluir cliente
-    const deleteCliente = async (id) => {
-        try {
-            await api.delete(`/cliente/delete_cliente/${id}`);
+    const deleteCliente = async () => {
+        if (!clienteParaExcluir) return;
 
-            await cliente_api();
+        try {
+            await api.delete(`/cliente/delete_cliente/${clienteParaExcluir.id_cliente}`);
+
+            setClientes((listaAtual) =>
+                listaAtual.filter(
+                    (cliente) => cliente.id_cliente !== clienteParaExcluir.id_cliente
+                )
+            );
 
             toast.success('Cliente excluído com sucesso!');
         } catch (error) {
             console.error('Erro ao excluir cliente:', error.response?.data || error);
             toast.error('Erro ao excluir cliente!');
+            throw error;
         }
     };
 
@@ -148,7 +158,7 @@ function Clientes() {
     };
 
     useEffect(() => {
-        if (!showClientesForm) return;
+        if (!showClientesForm && !clienteParaExcluir) return;
 
         const overflowAnterior = document.body.style.overflow;
 
@@ -157,7 +167,7 @@ function Clientes() {
         return () => {
             document.body.style.overflow = overflowAnterior;
         };
-    }, [showClientesForm]);
+    }, [showClientesForm, clienteParaExcluir]);
 
     return (
         <div className="min-h-screen bg-[var(--background)] text-[var(--text)]">
@@ -217,11 +227,7 @@ function Clientes() {
                             titulo={cliente.nome}
                             icone={User}
                             onEdit={() => onEdit(cliente)}
-                            onDelete={() => {
-                                if (window.confirm('Deseja excluir este cliente?')) {
-                                    deleteCliente(cliente.id_cliente);
-                                }
-                            }}
+                            onDelete={() => setClienteParaExcluir(cliente)}
                         >
                             <p className="mt-1 text-texto-suave">Email: {cliente.email}</p>
 
@@ -360,6 +366,14 @@ function Clientes() {
                     </div>
                 </div>
             )}
+
+            <DeleteModal
+                isOpen={!!clienteParaExcluir}
+                onClose={() => setClienteParaExcluir(null)}
+                onConfirm={deleteCliente}
+                titulo="Excluir cliente"
+                descricao={`Tem certeza de que deseja excluir o cliente ${clienteParaExcluir?.nome ?? ''}?`}
+            />
         </div>
     );
 }

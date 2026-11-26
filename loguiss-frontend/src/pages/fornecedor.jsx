@@ -1,8 +1,10 @@
+
 import { Building2, Search } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
 import { Button } from '../components/button';
+import { DeleteModal } from '../components/deleteModal';
 import { EntityCard } from '../components/card';
 import { Inputs } from '../components/inputs';
 import { SideBar } from '../components/sidebar';
@@ -28,6 +30,7 @@ function Fornecedor() {
     const [searchTerm, setSearchTerm] = useState('');
     const [appliedSearch, setAppliedSearch] = useState('');
     const [editingIndex, setEditingIndex] = useState(null);
+    const [fornecedorParaExcluir, setFornecedorParaExcluir] = useState(null);
     const [newFornecedor, setNewFornecedor] = useState(fornecedorInicial);
 
     const filteredFornecedores = (fornecedores ?? [])
@@ -132,17 +135,25 @@ function Fornecedor() {
     };
 
     // Excluir fornecedor
-    const deleteFornecedor = async (id) => {
-        try {
-            await api.delete(`/fornecedor/delete_fornecedor/${id}`);
+    const deleteFornecedor = async () => {
+        if (!fornecedorParaExcluir) return;
 
-            await fornecedores_api();
+        try {
+            await api.delete(`/fornecedor/delete_fornecedor/${fornecedorParaExcluir.id_fornecedor}`);
+
+            setFornecedores((listaAtual) =>
+                listaAtual.filter(
+                    (fornecedor) =>
+                        fornecedor.id_fornecedor !== fornecedorParaExcluir.id_fornecedor
+                )
+            );
 
             toast.success('Fornecedor excluído com sucesso!');
         } catch (error) {
             console.error('Erro ao excluir fornecedor:', error.response?.data || error);
 
             toast.error(error.response?.data?.MSG || 'Erro ao excluir fornecedor!');
+            throw error;
         }
     };
 
@@ -163,7 +174,7 @@ function Fornecedor() {
     };
 
     useEffect(() => {
-        if (!showFornecedorForm) return;
+        if (!showFornecedorForm && !fornecedorParaExcluir) return;
 
         const overflowAnterior = document.body.style.overflow;
 
@@ -172,7 +183,7 @@ function Fornecedor() {
         return () => {
             document.body.style.overflow = overflowAnterior;
         };
-    }, [showFornecedorForm]);
+    }, [showFornecedorForm, fornecedorParaExcluir]);
 
     return (
         <div className="min-h-screen bg-[var(--background)] text-[var(--text)]">
@@ -232,11 +243,7 @@ function Fornecedor() {
                                 <Building2 className="mt-2 h-6 w-6 text-[var(--text-secondary)]" />
                             }
                             onEdit={() => onEdit(fornecedor)}
-                            onDelete={() => {
-                                if (window.confirm('Deseja excluir este fornecedor?')) {
-                                    deleteFornecedor(fornecedor.id_fornecedor);
-                                }
-                            }}
+                            onDelete={() => setFornecedorParaExcluir(fornecedor)}
                         >
                             <p className="mt-1 text-[var(--text-secondary)]">
                                 CNPJ: {fornecedor.cnpj}
@@ -414,6 +421,14 @@ function Fornecedor() {
                     </div>
                 </div>
             )}
+
+            <DeleteModal
+                isOpen={!!fornecedorParaExcluir}
+                onClose={() => setFornecedorParaExcluir(null)}
+                onConfirm={deleteFornecedor}
+                titulo="Excluir fornecedor"
+                descricao={`Tem certeza de que deseja excluir o fornecedor ${fornecedorParaExcluir?.nome ?? ''}?`}
+            />
         </div>
     );
 }
