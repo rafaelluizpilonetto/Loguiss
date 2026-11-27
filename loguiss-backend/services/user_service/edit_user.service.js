@@ -1,4 +1,5 @@
 import { prisma } from "../../database.js";
+import { validarCPF } from "../../utils/validacoes.js";
 
 export default async function edit_user_service(req, res) {
     const {
@@ -11,6 +12,11 @@ export default async function edit_user_service(req, res) {
         tipo_user
     } = req.body
     const id_user = req.params.id_user
+
+    if (!validarCPF(cpf)) {
+        return res.status(400).json({MSG: "CPF inválido. Confira o número informado."})
+    }
+
     try {
 
         if(senha != confirmar_senha){

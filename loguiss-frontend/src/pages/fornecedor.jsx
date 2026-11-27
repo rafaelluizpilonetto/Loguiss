@@ -9,7 +9,7 @@ import { EntityCard } from '../components/card';
 import { Inputs } from '../components/inputs';
 import { SideBar } from '../components/sidebar';
 import api from '../services/api';
-import { formatarCPFCNPJ, formatarTelefone } from '../utils/validacoes';
+import { formatarCPFCNPJ, formatarTelefone, validarCNPJ } from '../utils/validacoes';
 
 const fornecedorInicial = {
     cnpj: '',
@@ -299,6 +299,11 @@ function Fornecedor() {
                         <form
                             onSubmit={async (e) => {
                                 e.preventDefault();
+
+                                if (!validarCNPJ(newFornecedor.cnpj)) {
+                                    toast.error('CNPJ inválido. Confira o número informado.');
+                                    return;
+                                }
 
                                 if (editingIndex !== null) {
                                     await editFornecedor(editingIndex, newFornecedor);
