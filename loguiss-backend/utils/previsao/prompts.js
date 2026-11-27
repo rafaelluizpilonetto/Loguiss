@@ -116,11 +116,20 @@ export function montarMensagemPrevisao({
     }));
 
   let movimentacoesRestantes = MAX_MOVIMENTACOES_PREVISAO;
+  const limitePorProduto = Math.max(
+    1,
+    Math.ceil(MAX_MOVIMENTACOES_PREVISAO / Math.max(produtos.length, 1)),
+  );
+
   const produtosEnxutos = produtos.map((p) => {
     const historico = p.historico_saidas.quantidades_por_dia;
     const inicio = Math.max(0, historico.length - DIAS_HISTORICO_ENVIADO);
-    const movimentacoes = (p.movimentacoes_recentes ?? []).slice(0, movimentacoesRestantes);
-    movimentacoesRestantes -= movimentacoes.length;
+    const quantidadePermitida = Math.min(
+      limitePorProduto,
+      movimentacoesRestantes,
+    );
+    const movimentacoes = (p.movimentacoes_recentes ?? [])
+      .slice(0, quantidadePermitida);
     return {
       id: p.id_produto,
       nome: String(p.nome).slice(0, 80),

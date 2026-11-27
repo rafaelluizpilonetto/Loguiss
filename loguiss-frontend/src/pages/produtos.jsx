@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 import { Button } from '../components/button';
 import { EntityCard } from '../components/card';
 import { Combobox } from '../components/combobox';
+import { DeleteModal } from '../components/deleteModal';
 import { Inputs } from '../components/inputs';
 import { SideBar } from '../components/sidebar';
 import api from '../services/api';
@@ -61,6 +62,37 @@ function converterMoedaParaNumero(valorFormatado) {
     return Number.isFinite(numero) ? numero : 0;
 }
 
+// Normaliza datas vindas da API para o formato "AAAA-MM-DD" exigido por <input type="date" />
+function extrairDataInput(...candidatos) {
+    for (const valor of candidatos) {
+        if (!valor) continue;
+
+        if (valor instanceof Date && !Number.isNaN(valor.getTime())) {
+            return valor.toISOString().slice(0, 10);
+        }
+
+        const texto = String(valor).trim();
+        if (!texto) continue;
+
+        const matchIso = texto.match(/^(\d{4}-\d{2}-\d{2})/);
+        if (matchIso) {
+            return matchIso[1];
+        }
+
+        const matchBr = texto.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+        if (matchBr) {
+            return `${matchBr[3]}-${matchBr[2]}-${matchBr[1]}`;
+        }
+
+        const dataParseada = new Date(texto);
+        if (!Number.isNaN(dataParseada.getTime())) {
+            return dataParseada.toISOString().slice(0, 10);
+        }
+    }
+
+    return '';
+}
+
 const produtoInicial = {
     id_produto: null,
     id_tipo_produto: null,
@@ -90,19 +122,64 @@ const ingredienteInicial = {
 const receitaInicial = {
     nome: '',
     margemPerda: '',
-    quantidadePerdida: '',
     quantidadeProduzida: '',
     ingredientes: [ingredienteInicial],
+};
+
+const calcularPerdaPrevista = (quantidadeProduzida, margemPerdaPercentual) => {
+    const quantidade = Number(quantidadeProduzida);
+    const margem = Number(margemPerdaPercentual);
+
+    if (!Number.isFinite(quantidade) || !Number.isFinite(margem)) return 0;
+    return Number(((quantidade * margem) / 100).toFixed(10));
+};
+
+const produtoEhProducao = (produto) =>
+    Boolean(
+        produto.fgTipoProducao ??
+            String(produto.tipo_produto?.flag_tipo ?? produto.flag_tipo ?? produto.tipo ?? '')
+                .toUpperCase() === 'P',
+    );
+
+const receitaParaForm = (produto) => {
+    const receita = produto.receita_producao ?? produto.receita;
+    if (!receita) {
+        return {
+            ...receitaInicial,
+            ingredientes: receitaInicial.ingredientes.map((ingrediente) => ({ ...ingrediente })),
+        };
+    }
+
+    const ingredientes = receita.produtos ?? receita.ingredientes ?? [];
+    return {
+        nome: receita.descricao ?? receita.nome ?? '',
+        margemPerda: String(receita.margem_perda ?? receita.margemPerda ?? ''),
+        quantidadeProduzida: String(
+            receita.quantidade_produzida ?? receita.quantidadeProduzida ?? '',
+        ),
+        ingredientes: ingredientes.map((item) => ({
+            produto: item.produto?.descricao ?? item.descricao ?? '',
+            id_produto: item.id_produto ?? item.produto?.id_produto ?? null,
+            quantidade: String(item.quantidade ?? ''),
+            unidade:
+                item.unidade_medida?.nomenclatura ??
+                item.unidade_medida?.descrunidade ??
+                item.unidade ??
+                '',
+            id_unidade:
+                item.id_unidade ?? item.unidade_medida?.id_unidade ?? '',
+        })),
+    };
 };
 
 const produtoParaForm = (p) => {
     const categoria = p.categorias?.[0]?.categoria;
     const fornecedor = p.fornecedores?.[0]?.fornecedor;
-    const isProducao = Boolean(
-        p.fgTipoProducao ??
-            p.tipo_produto?.flag_tipo === 'P' ??
-            p.tipo === 'P',
-    );
+    const estoque = Array.isArray(p.estoques)
+        ? p.estoques[0] ?? {}
+        : p.estoque ?? {};
+    const unidadeObj = p.unidade_medida ?? p.unidadeMedida ?? null;
+    const isProducao = produtoEhProducao(p);
 
     return {
         ...produtoInicial,
@@ -111,17 +188,34 @@ const produtoParaForm = (p) => {
         desc: p.descricao ?? '',
         categoria: categoria?.descricao ?? '',
         id_categoria: categoria?.id_categoria ?? null,
-        fornecedor: fornecedor?.nome ?? '',
-        id_fornecedor: fornecedor?.id_fornecedor ?? null,
-        minimo: p.minimo ?? '',
+        fornecedor: fornecedor?.nome ?? estoque.fornecedor?.nome ?? '',
+        id_fornecedor: fornecedor?.id_fornecedor ?? estoque.id_fornecedor_user ?? null,
+        minimo: estoque.minimo ?? p.minimo ?? '',
         valor: formatarNumeroParaInput(p.valor),
-        quantidade_estoque: String(p.estoque?.quantidade ?? 0),
+        quantidade_estoque: String(estoque.quantidade ?? p.quantidade ?? 0),
         fgTipoProducao: isProducao,
-        unidade: p.unidade ?? '',
-        id_unidade_medida: p.id_unidade_medida ?? null,
-        dt_entrada: (p.dt_entrada ?? '').slice(0, 10),
-        prazo_saida: (p.prazo_saida ?? '').slice(0, 10),
-        dt_validade: (p.dt_validade ?? '').slice(0, 10),
+        unidade:
+            typeof p.unidade === 'string'
+                ? p.unidade
+                : unidadeObj?.nomenclatura ?? unidadeObj?.descrunidade ?? '',
+        id_unidade_medida:
+            p.id_unidade_medida ?? unidadeObj?.id_unidade ?? unidadeObj?.id_unidade_medida ?? null,
+        dt_entrada: extrairDataInput(
+            estoque.dt_entrada,
+            estoque.data_entrada,
+            p.dt_entrada,
+            p.data_entrada,
+        ),
+        prazo_saida: extrairDataInput(
+            estoque.prazo_saida,
+            p.prazo_saida,
+        ),
+        dt_validade: extrairDataInput(
+            estoque.dt_validade,
+            estoque.data_validade,
+            p.dt_validade,
+            p.data_validade,
+        ),
     };
 };
 
@@ -138,12 +232,12 @@ function Produtos() {
     const [fornecedores, setFornecedores] = useState([]);
     const [categorias, setCategorias] = useState([]);
     const [unidades, setUnidades] = useState([]);
-    const [tiposProduto, setTiposProduto] = useState([]);
 
     const [searchTerm, setSearchTerm] = useState('');
     const [appliedSearch, setAppliedSearch] = useState('');
 
     const [editingId, setEditingId] = useState(null);
+    const [produtoParaExcluir, setProdutoParaExcluir] = useState(null);
     const [newProduct, setNewProduct] = useState(produtoInicial);
     const [newReceita, setNewReceita] = useState(receitaInicial);
 
@@ -154,35 +248,13 @@ function Produtos() {
     // Retorna "P" quando marcado (produto produção) e "N" quando desmarcado (produto normal)
     const obterFlagTipo = (fgProducao) => (fgProducao ? 'P' : 'N');
 
-    const resolverIdTipoProduto = (fgProducao) => {
-        const flagDesejada = obterFlagTipo(fgProducao);
-
-        const encontrado = tiposProduto.find(
-            (tipo) =>
-                String(tipo.flag_tipo ?? tipo.sigla ?? tipo.tipo ?? '').toUpperCase() ===
-                flagDesejada,
-        );
-
-        if (encontrado?.id_tipo_produto) {
-            return Number(encontrado.id_tipo_produto);
-        }
-
-        if (newProduct.id_tipo_produto) {
-            return Number(newProduct.id_tipo_produto);
-        }
-
-        // Fallback padrão caso não haja lista de tipos carregada
-        return fgProducao ? 2 : 1;
-    };
-
     const montarPayloadProduto = () => {
         const flagTipo = obterFlagTipo(newProduct.fgTipoProducao);
-        const idTipoProduto = resolverIdTipoProduto(newProduct.fgTipoProducao);
         const valorNumerico = converterMoedaParaNumero(newProduct.valor);
 
         return {
             descricao: newProduct.desc.trim(),
-            id_tipo_produto: idTipoProduto,
+            id_tipo_produto: newProduct.id_tipo_produto,
             tipo: flagTipo,
             flag_tipo: flagTipo,
             id_unidade_medida: Number(newProduct.id_unidade_medida),
@@ -198,6 +270,7 @@ function Produtos() {
                 dt_entrada: newProduct.dt_entrada,
                 minimo: Number(newProduct.minimo),
                 prazo_saida: newProduct.prazo_saida,
+                dt_validade: newProduct.dt_validade || null,
             },
 
             receita: newProduct.fgTipoProducao
@@ -205,7 +278,10 @@ function Produtos() {
                       descricao: newReceita.nome,
                       margem_perda: Number(newReceita.margemPerda),
                       quantidade_produzida: Number(newReceita.quantidadeProduzida),
-                      quantidade_perdida: Number(newReceita.quantidadePerdida),
+                      quantidade_perdida: calcularPerdaPrevista(
+                          newReceita.quantidadeProduzida,
+                          newReceita.margemPerda,
+                      ),
                   }
                 : null,
 
@@ -233,14 +309,6 @@ function Produtos() {
             setCategorias(lista(resultados[2], 'categorias'));
             setUnidades(lista(resultados[3], 'unidades'));
 
-            if (resultados[4]?.status === 'fulfilled') {
-                const dataTipos = resultados[4].value.data;
-                const listaTipos = Array.isArray(dataTipos)
-                    ? dataTipos
-                    : dataTipos?.tiposProduto ?? dataTipos?.tipos_produto ?? dataTipos?.tipos ?? [];
-                setTiposProduto(listaTipos);
-            }
-
             if (resultados.slice(0, 4).some((r) => r.status === 'rejected')) {
                 toast.error('Alguns dados não puderam ser carregados.');
             }
@@ -250,8 +318,8 @@ function Produtos() {
     }, []);
 
     useEffect(() => {
-        // bloqueia o scroll da tela de trás quando um modal estiver aberto
-        if (!showProductForm) return;
+        // bloqueia o scroll da tela de trás quando algum modal estiver aberto
+        if (!showProductForm && !produtoParaExcluir) return;
 
         const overflowAnterior = document.body.style.overflow;
 
@@ -260,7 +328,7 @@ function Produtos() {
         return () => {
             document.body.style.overflow = overflowAnterior;
         };
-    }, [showProductForm]);
+    }, [showProductForm, produtoParaExcluir]);
 
     const setCampo = (campo) => (e) =>
         setNewProduct((prev) => ({
@@ -277,18 +345,9 @@ function Produtos() {
     };
 
     const handleToggleProducao = (e) => {
-        const marcado = e.target.checked;
-        const flagDesejada = obterFlagTipo(marcado);
-        const tipoEncontrado = tiposProduto.find(
-            (tipo) =>
-                String(tipo.flag_tipo ?? tipo.sigla ?? tipo.tipo ?? '').toUpperCase() ===
-                flagDesejada,
-        );
-
         setNewProduct((prev) => ({
             ...prev,
-            fgTipoProducao: marcado,
-            id_tipo_produto: tipoEncontrado?.id_tipo_produto ?? (marcado ? 2 : 1),
+            fgTipoProducao: e.target.checked,
         }));
     };
 
@@ -328,7 +387,7 @@ function Produtos() {
     const abrirEdicao = (produto) => {
         setEditingId(produto.id_produto);
         setNewProduct(produtoParaForm(produto));
-        setNewReceita(produto.receita ?? receitaInicial);
+        setNewReceita(receitaParaForm(produto));
         setShowProductForm(true);
     };
 
@@ -352,8 +411,26 @@ function Produtos() {
             return 'Escolha um fornecedor da lista.';
         }
 
-        if (newProduct.fgTipoProducao && newReceita.ingredientes.some((i) => !i.id_produto)) {
+        if (
+            newProduct.fgTipoProducao &&
+            newReceita.ingredientes.some(
+                (ingrediente) =>
+                    !Number.isInteger(Number(ingrediente.id_produto)) ||
+                    Number(ingrediente.id_produto) <= 0,
+            )
+        ) {
             return 'Escolha os produtos da receita na lista.';
+        }
+
+        if (
+            newProduct.fgTipoProducao &&
+            newReceita.ingredientes.some(
+                (ingrediente) =>
+                    !Number.isInteger(Number(ingrediente.id_unidade)) ||
+                    Number(ingrediente.id_unidade) <= 0,
+            )
+        ) {
+            return 'Escolha uma unidade para cada ingrediente na lista.';
         }
 
         return '';
@@ -362,21 +439,43 @@ function Produtos() {
     const [saving, setSaving] = useState(false);
 
     const editarProduto = async () => {
-        const flagTipo = obterFlagTipo(newProduct.fgTipoProducao);
-        const idTipoProduto = resolverIdTipoProduto(newProduct.fgTipoProducao);
         const valorNumerico = converterMoedaParaNumero(newProduct.valor);
 
         const payload = {
             descricao: newProduct.desc.trim(),
-            id_tipo_produto: idTipoProduto,
-            tipo: flagTipo,
-            flag_tipo: flagTipo,
             id_unidade_medida: Number(newProduct.id_unidade_medida),
             valor: valorNumerico,
             flag_ativo: 'T',
+            dt_entrada: newProduct.dt_entrada || null,
+            prazo_saida: newProduct.prazo_saida || null,
+            dt_validade: newProduct.dt_validade || null,
+            estoque: {
+                dt_entrada: newProduct.dt_entrada || null,
+                prazo_saida: newProduct.prazo_saida || null,
+                dt_validade: newProduct.dt_validade || null,
+                minimo: Number(newProduct.minimo),
+            },
+            receita: newProduct.fgTipoProducao
+                ? {
+                      descricao: newReceita.nome,
+                      margem_perda: Number(newReceita.margemPerda),
+                      quantidade_produzida: Number(newReceita.quantidadeProduzida),
+                      quantidade_perdida: calcularPerdaPrevista(
+                          newReceita.quantidadeProduzida,
+                          newReceita.margemPerda,
+                      ),
+                  }
+                : null,
+            ingredientes: newProduct.fgTipoProducao
+                ? newReceita.ingredientes.map((ingrediente) => ({
+                      id_produto: Number(ingrediente.id_produto),
+                      quantidade: Number(ingrediente.quantidade),
+                      unidade_medida_ingrediente: Number(ingrediente.id_unidade),
+                  }))
+                : [],
         };
 
-        const response = await api.put(`/produto/edit_produto/${editingId}`, payload);
+        const response = await api.patch(`/produto/edit_produto/${editingId}`, payload);
 
         toast.success(response.data.MSG || 'Produto atualizado com sucesso!');
     };
@@ -429,15 +528,29 @@ function Produtos() {
         }
     };
 
-    const excluirProduto = async (id_produto) => {
+    const excluirProduto = async () => {
+        if (!produtoParaExcluir) return;
+
         try {
-            const response = await api.delete(`/produto/delete_produto/${id_produto}`);
+            await api.delete(
+                `/produto/delete_produto/${produtoParaExcluir.id_produto}`
+            );
 
-            toast.success(response.data.MSG || 'Produto desativado com sucesso!');
+            setProducts((listaAtual) =>
+                listaAtual.filter(
+                    (item) => item.id_produto !== produtoParaExcluir.id_produto
+                )
+            );
 
-            setProducts((prev) => prev.filter((produto) => produto.id_produto !== id_produto));
+            toast.success('Produto excluído com sucesso!');
         } catch (error) {
-            toast.error(error.response?.data?.MSG || 'Erro ao desativar produto!');
+            console.error('Erro ao excluir:', error);
+
+            toast.error(
+                error.response?.data?.MSG || 'Erro ao excluir o produto.'
+            );
+
+            throw error;
         }
     };
 
@@ -484,11 +597,7 @@ function Produtos() {
                     )}
 
                     {filteredProducts.map((produto) => {
-                        const isProducao = Boolean(
-                            produto.fgTipoProducao ??
-                                produto.tipo_produto?.flag_tipo === 'P' ??
-                                produto.tipo === 'P',
-                        );
+                        const isProducao = produtoEhProducao(produto);
 
                         return (
                             <EntityCard
@@ -496,7 +605,7 @@ function Produtos() {
                                 titulo={produto.descricao}
                                 icone={Package}
                                 onEdit={() => abrirEdicao(produto)}
-                                onDelete={() => excluirProduto(produto.id_produto)}
+                                onDelete={() => setProdutoParaExcluir(produto)}
                             >
                                 <p className="mt-2 text-texto-suave">
                                     Categoria:{' '}
@@ -527,7 +636,7 @@ function Produtos() {
                 </div>
             </main>
 
-            {/* Modal */}
+            {/* Modal de cadastro/edição */}
             {showProductForm && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
                     <div className="flex max-h-[calc(100vh-2rem)] w-full max-w-2xl flex-col overflow-hidden rounded-2xl border border-borda bg-superficie shadow-[0_20px_80px_rgba(0,0,0,0.6)]">
@@ -696,12 +805,19 @@ function Produtos() {
 
                                         {/* Tipo de produto */}
                                         <div className="sm:col-span-2">
-                                            <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-borda bg-elevada/50 p-4 transition-colors hover:border-primaria/40">
+                                            <label
+                                                className={`flex items-center gap-3 rounded-xl border border-borda bg-elevada/50 p-4 transition-colors ${
+                                                    editingId === null
+                                                        ? 'cursor-pointer hover:border-primaria/40'
+                                                        : 'cursor-not-allowed opacity-70'
+                                                }`}
+                                            >
                                                 <input
                                                     type="checkbox"
                                                     checked={newProduct.fgTipoProducao}
                                                     onChange={handleToggleProducao}
-                                                    className="h-5 w-5 cursor-pointer accent-primaria"
+                                                    disabled={editingId !== null}
+                                                    className="h-5 w-5 cursor-pointer accent-primaria disabled:cursor-not-allowed"
                                                 />
 
                                                 <div>
@@ -710,7 +826,9 @@ function Produtos() {
                                                     </span>
 
                                                     <span className="text-xs text-texto-suave">
-                                                        {newProduct.fgTipoProducao
+                                                        {editingId !== null
+                                                            ? 'O tipo do produto não pode ser alterado após o cadastro.'
+                                                            : newProduct.fgTipoProducao
                                                             ? 'Tipo "P": produto de produção (permite cadastrar receita e ingredientes).'
                                                             : 'Tipo "N": produto normal.'}
                                                     </span>
@@ -754,6 +872,7 @@ function Produtos() {
                                                 type="number"
                                                 min="0"
                                                 max="100"
+                                                step="any"
                                                 value={newReceita.margemPerda}
                                                 onChange={setCampoReceita('margemPerda')}
                                                 placeholder="0"
@@ -763,6 +882,7 @@ function Produtos() {
                                                 label="Quantidade produzida"
                                                 type="number"
                                                 min="0"
+                                                step="any"
                                                 value={newReceita.quantidadeProduzida}
                                                 onChange={setCampoReceita('quantidadeProduzida')}
                                                 placeholder="0"
@@ -770,12 +890,16 @@ function Produtos() {
                                             />
 
                                             <Inputs
-                                                label="Quantidade perdida"
+                                                label="Previsão de perda"
                                                 type="number"
                                                 min="0"
-                                                value={newReceita.quantidadePerdida}
-                                                onChange={setCampoReceita('quantidadePerdida')}
-                                                placeholder="0"
+                                                step="any"
+                                                value={calcularPerdaPrevista(
+                                                    newReceita.quantidadeProduzida,
+                                                    newReceita.margemPerda,
+                                                )}
+                                                readOnly
+                                                aria-label="Previsão de perda calculada automaticamente"
                                             />
                                         </div>
 
@@ -905,6 +1029,14 @@ function Produtos() {
                     </div>
                 </div>
             )}
+
+            <DeleteModal
+                isOpen={!!produtoParaExcluir}
+                onClose={() => setProdutoParaExcluir(null)}
+                onConfirm={excluirProduto}
+                titulo="Excluir produto"
+                descricao={`Tem certeza de que deseja excluir o produto ${produtoParaExcluir?.descricao}?`}
+            />
         </div>
     );
 }

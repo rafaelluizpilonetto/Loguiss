@@ -12,21 +12,39 @@ import { adaptarProdutosDashboard } from '../utils/dashboardUtils';
 
 function Dashboard() {
     const [produtos, setProdutos] = useState([]);
+    const [dadosDashboard, setDadosDashboard] = useState(null);
 
     useEffect(() => {
+        let ativo = true;
+
+        const buscarDadosDashboard = async () => {
+            try {
+                const response = await api.get('/dashboard/dash');
+
+                if (ativo) setDadosDashboard(response.data);
+            } catch (error) {
+                console.error('Erro ao buscar dados do dashboard:', error);
+            }
+        };
+
         const buscarProdutos = async () => {
             try {
                 const response = await api.get('/produto/list_produtos');
 
                 const produtosAdaptados = adaptarProdutosDashboard(response.data.produtos);
 
-                setProdutos(produtosAdaptados);
+                if (ativo) setProdutos(produtosAdaptados);
             } catch (error) {
                 console.error('Erro ao buscar produtos:', error);
             }
         };
 
+        buscarDadosDashboard();
         buscarProdutos();
+
+        return () => {
+            ativo = false;
+        };
     }, []);
 
     return (
@@ -43,15 +61,15 @@ function Dashboard() {
                 <div className="grid grid-cols-1 gap-5">
                     <CardsIndicadores produtos={produtos} />
                     <AlertaEstoque produtos={produtos} />
-                    <Movimentacoes />
+                    <Movimentacoes movimentacoes={dadosDashboard?.movimentacoes ?? []} />
                     
                     {/* Troque gap-0 por gap-5 (ou o valor padrão do seu projeto) */}
                     <div className="grid grid-cols-1 gap-5 xl:grid-cols-2">
-                        <DistribuicaoCategoria />
-                        <ProdutosParados produtos={produtos} />
+                        <DistribuicaoCategoria produtos={dadosDashboard?.produtos ?? []} />
+                        <ProdutosParados produtos={dadosDashboard?.produtos ?? []} />
                     </div>
 
-                    <EvolucaoVendas />
+                    <EvolucaoVendas dadosEvolucao={dadosDashboard?.evolucaoVendas} />
                 </div>
             </main>
         </div>

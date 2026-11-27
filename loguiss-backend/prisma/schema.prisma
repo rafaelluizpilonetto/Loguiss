@@ -76,6 +76,7 @@ model produto {
   id_tipo_produto   Int
   id_unidade_medida Int
   flag_ativo        String                 @default("T")
+  dt_validade       DateTime?
   created_at        DateTime               @default(now())
   updated_at        DateTime               @updatedAt
   valor             Decimal
@@ -84,6 +85,7 @@ model produto {
   movimentacoes     movimentacao_estoque[]
   tipo_produto      tipo_produto           @relation(fields: [id_tipo_produto], references: [id_tipo_produto])
   unidade_medida    unidade_medida         @relation(fields: [id_unidade_medida], references: [id_unidade])
+  receita_producao  receita?
   categorias        produto_categoria[]
   receitas          receita_produto[]
   previsoes         previsao_produto[]
@@ -112,6 +114,8 @@ model receita {
   margem_perda         Decimal           @default(0)
   quantidade_perdida   Decimal           @default(0)
   quantidade_produzida Decimal           @default(0)
+  id_produto_producao  Int?              @unique
+  produto_producao     produto?          @relation(fields: [id_produto_producao], references: [id_produto], onDelete: SetNull)
   produtos             receita_produto[]
 }
 
