@@ -9,7 +9,12 @@ import { EntityCard } from '../components/card';
 import { Inputs } from '../components/inputs';
 import { SideBar } from '../components/sidebar';
 import api from '../services/api';
-import { formatarCPFCNPJ, formatarTelefone } from '../utils/validacoes';
+import {
+    formatarCPFCNPJ,
+    formatarTelefone,
+    validarCNPJ,
+    validarCPF,
+} from '../utils/validacoes';
 
 function Clientes() {
     const [showClientesForm, setShowClientesForm] = useState(false);
@@ -272,6 +277,21 @@ function Clientes() {
                         <form
                             onSubmit={async (e) => {
                                 e.preventDefault();
+
+                                const quantidadeDigitos = String(newCliente.cpf ?? '').replace(
+                                    /[^A-Z0-9]/gi,
+                                    '',
+                                ).length;
+                                const documentoValido =
+                                    quantidadeDigitos === 11
+                                        ? validarCPF(newCliente.cpf)
+                                        : quantidadeDigitos === 14
+                                          ? validarCNPJ(newCliente.cpf)
+                                          : false;
+                                if (!documentoValido) {
+                                    toast.error('CPF ou CNPJ inválido. Confira o número informado.');
+                                    return;
+                                }
 
                                 if (editingIndex !== null) {
                                     await editCliente(editingIndex, newCliente);

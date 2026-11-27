@@ -10,7 +10,7 @@ import { EntityCard } from '../components/card';
 import { Inputs } from '../components/inputs';
 import { SideBar } from '../components/sidebar';
 import api from '../services/api';
-import { formatarCPFCNPJ, formatarTelefone } from '../utils/validacoes';
+import { formatarCPFCNPJ, formatarTelefone, validarCPF } from '../utils/validacoes';
 
 const USUARIO_VAZIO = {
     desc: '',
@@ -215,6 +215,11 @@ function Usuarios() {
 
     const salvarUsuario = async (e) => {
         e.preventDefault();
+
+        if (!validarCPF(newUsuario.cpf)) {
+            toast.error('CPF inválido. Confira o número informado.');
+            return;
+        }
 
         // Senha é obrigatória só no cadastro
         if (!editando && (!newUsuario.senha || !newUsuario.confirm_senha)) {

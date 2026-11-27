@@ -1,4 +1,5 @@
 import { prisma } from "../../database.js"
+import { validarCPF } from "../../utils/validacoes.js";
 
 
 export default async function cadastro_user_service(req, res) {
@@ -13,6 +14,9 @@ export default async function cadastro_user_service(req, res) {
     } = req.body
     if (!nome || !email || !senha || !confirmar_senha || !telefone || !cpf || !tipo_user) {
         return res.status(400).json({MSG: "Favor revisar dados mandados, algo está faltando"})
+    }
+    if (!validarCPF(cpf)) {
+        return res.status(400).json({MSG: "CPF inválido. Confira o número informado."})
     }
 
     // Validação se existe email

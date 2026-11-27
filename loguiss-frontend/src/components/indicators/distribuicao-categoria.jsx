@@ -8,7 +8,6 @@ import {
     useIsTooltipActive,
 } from 'recharts';
 
-import { produtos } from '../../data/dashboardData';
 import { estiloTooltip } from '../../utils/graficos';
 
 const COLORS = [
@@ -62,7 +61,7 @@ const MyCustomPie = (props) => {
     );
 };
 
-export function DistribuicaoCategoria() {
+export function DistribuicaoCategoria({ produtos = [] }) {
     const dadosCategoria = Object.values(
         produtos.reduce((acumulador, produto) => {
             const categoria = produto.categoria;

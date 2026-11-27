@@ -58,7 +58,7 @@ export default async function create_movi_service(req, res) {
                         id_produto: Number(id_produto),
                         quantidade: Number(quantidade),
                         saldo_final: produto.quantidade,
-                        tipo: tipo,
+                        tipo:  "SAIDA",
                         valor_total: valor_unitario * Number(quantidade),
                         valor_unitario: Number(valor_unitario)
                     }
@@ -100,7 +100,7 @@ export default async function create_movi_service(req, res) {
                         id_produto: Number(id_produto),
                         quantidade: Number(quantidade),
                         saldo_final: produto.quantidade,
-                        tipo: tipo,
+                        tipo: "ENTRADA",
                         valor_total: valor_unitario * Number(quantidade),
                         valor_unitario: Number(valor_unitario),
                         prazo_chegada: prazo_chegada

@@ -1,8 +1,6 @@
 import { ChevronDown } from 'lucide-react';
 import { useState } from 'react';
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
-import { movimentacoes } from '../../data/dashboardData';
-
 
 import { corGrafico, estiloTooltip } from '../../utils/graficos';
 import { Button } from '../button';
@@ -13,21 +11,35 @@ const periodos = [
     { label: 'Últimos 12 meses', meses: 12 },
 ];
 
-const dados = movimentacoes
+function limitarCasasDecimais(valor, casas = 2) {
+    const limite = Math.max(0, Math.min(6, Number(casas) || 0));
+    const numero = Number(valor);
+    if (!Number.isFinite(numero)) return 0;
+    return Number(numero.toFixed(limite));
+}
 
-export function Movimentacoes() {
+export function Movimentacoes({ movimentacoes = [], casasDecimais = 2 }) {
     const [periodoSelecionado, setPeriodoSelecionado] = useState(periodos[2]);
 
     const [menuAberto, setMenuAberto] = useState(false);
 
     const mesAtual = new Date().getMonth();
 
-    const dadosFiltrados = Array.from({ length: periodoSelecionado.meses }, (_, indice) => {
-        const indiceMes =
-            (mesAtual - periodoSelecionado.meses + 1 + indice + dados.length) % dados.length;
+    const dadosFiltrados = movimentacoes.length
+        ? Array.from({ length: periodoSelecionado.meses }, (_, indice) => {
+              const indiceMes =
+                  (mesAtual - periodoSelecionado.meses + 1 + indice + movimentacoes.length) %
+                  movimentacoes.length;
 
-        return dados[indiceMes];
-    });
+              const item = movimentacoes[indiceMes] ?? {};
+
+              return {
+                  ...item,
+                  entradas: limitarCasasDecimais(item.entradas, casasDecimais),
+                  saidas: limitarCasasDecimais(item.saidas, casasDecimais),
+              };
+          })
+        : [];
 
     return (
         <div className="mb-0 h-[380px] w-full rounded-xl border border-borda bg-superficie p-5">
@@ -92,11 +104,16 @@ export function Movimentacoes() {
 
                     <XAxis dataKey="mes" stroke={corGrafico.eixo} tickLine={false} />
 
-                    <YAxis stroke={corGrafico.eixo} tickLine={false} />
+                    <YAxis
+                        stroke={corGrafico.eixo}
+                        tickLine={false}
+                        tickFormatter={(valor) => limitarCasasDecimais(valor, casasDecimais)}
+                    />
 
                     <Tooltip
                         {...estiloTooltip}
                         cursor={{ fill: 'var(--text)', fillOpacity: 0.05 }}
+                        formatter={(valor) => limitarCasasDecimais(valor, casasDecimais)}
                     />
                     <Bar
                         dataKey="entradas"

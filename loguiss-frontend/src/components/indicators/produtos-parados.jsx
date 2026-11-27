@@ -1,9 +1,8 @@
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 
-import { produtos } from '../../data/dashboardData';
 import { corGrafico, estiloTooltip } from '../../utils/graficos';
 
-export function ProdutosParados() {
+export function ProdutosParados({ produtos = [] }) {
     const data = produtos
         .filter((produto) => produto.diasSemMovimentacao > 0)
         .sort((a, b) => b.diasSemMovimentacao - a.diasSemMovimentacao)

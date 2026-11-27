@@ -1,4 +1,5 @@
 import {prisma} from "../../database.js";
+import { validarCNPJ } from "../../utils/validacoes.js";
 
 
 export default async function create_fornecedor_service(req, res) {
@@ -15,6 +16,9 @@ export default async function create_fornecedor_service(req, res) {
 
     if(!cnpj || !email || !nome || !telefone){
         return res.status(400).json({MSG: "Algum dado faltante, favor conferir!!"})
+    }
+    if (!validarCNPJ(cnpj)) {
+        return res.status(400).json({MSG: "CNPJ inválido. Confira o número informado."})
     }
 
     try {

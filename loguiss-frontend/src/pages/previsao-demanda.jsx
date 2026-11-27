@@ -90,12 +90,6 @@ function PrevisaoDemanda() {
                                 modelo {previsao.previsao.modelo}
                             </p>
                         )}
-                        {usaProjecaoLocal && (
-                            <p className="mt-2 text-xs text-amber-400" role="status">
-                                Esta previsão inclui projeção local porque o Gemini estava
-                                indisponível. Os dados abaixo são da previsão salva.
-                            </p>
-                        )}
                         {previsaoIncompleta && (
                             <p className="mt-2 text-xs text-amber-400" role="status">
                                 A última previsão contém {dadosIA.length} de {horizonteDias} dias.
